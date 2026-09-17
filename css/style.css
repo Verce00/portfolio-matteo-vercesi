@@ -1799,54 +1799,17 @@ footer {
   justify-content: center;
 }
 
-/* ---------- Detail (cropped shot + explanation, paired) ---------- */
-.project-detail {
-  background: var(--bg);
-  color: var(--text);
-  padding-block: clamp(64px, 9vw, 100px);
-}
-
-.project-detail__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(32px, 6vw, 80px);
-  align-items: center;
-}
-
-.project-detail__img {
-  width: 100%;
-  border-radius: 20px;
-  display: block;
-  -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-}
-
-.project-detail__headline {
-  margin-top: 16px;
-  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
-  line-height: 1.15;
-}
-
-.project-detail__body {
-  margin-top: 20px;
-  font-size: clamp(1rem, 1.6vw, 1.15rem);
-  line-height: 1.6;
-  color: var(--text-muted);
-}
-
-@media (max-width: 800px) {
-  .project-detail__grid {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-}
-
 /* ---------- Detail video (scroll-scrubbed frame sequence) ---------- */
 /* Tacta only: a frame-by-frame product close-up advanced by scroll
    position instead of played back - apple.com's own technique for these
-   moments. A sequence of plain JPEGs drawn to a canvas (not a compressed
-   <video>) gives frame-accurate scrubbing with no seek lag, and sidesteps
-   mobile Safari's autoplay/programmatic-seek restrictions entirely. */
+   moments. A sequence of plain WebP images drawn to a canvas (not a
+   compressed <video>) gives frame-accurate scrubbing with no seek lag,
+   and sidesteps mobile Safari's autoplay/programmatic-seek restrictions
+   entirely. The explanatory copy (formerly its own static section above
+   this one) now arrives as a caption overlaid on the video itself,
+   revealed early in the scrub instead of sitting there already read
+   before the scroll even starts - apple.com's own pattern for these
+   moments pairs the copy with the footage, not before it. */
 .project-scrollvid {
   background: #000;
 }
@@ -1870,6 +1833,45 @@ footer {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* Overlaid on the canvas' left edge rather than placed beside it, so the
+   copy and the footage read as one composed shot - the same left-caption
+   apple.com uses over its own product close-ups. Revealed by JS (see
+   project.js) in step with scroll progress, not a CSS transition: its
+   opacity/position is driven by the same scroll-derived value as the
+   frame index, not an independent trigger. */
+.project-scrollvid__caption {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  max-width: min(440px, 86vw);
+  padding: 0 24px clamp(48px, 9vh, 96px);
+  /* Dark toward the caption, clear toward the subject - legible over
+     whatever the frame underneath happens to be, without a hard box. */
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0) 85%);
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+}
+
+.project-scrollvid__caption .eyebrow {
+  color: #fff;
+}
+
+.project-scrollvid__headline {
+  margin-top: 16px;
+  color: #fff;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  line-height: 1.15;
+}
+
+.project-scrollvid__body {
+  margin-top: 16px;
+  font-size: clamp(0.92rem, 1.4vw, 1.05rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 /* ---------- Gallery (two communication shots, side by side) ---------- */

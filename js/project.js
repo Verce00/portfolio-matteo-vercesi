@@ -45,6 +45,7 @@
 
   const stage = document.getElementById("tactaScrollVid");
   const canvas = document.getElementById("tactaScrollVidCanvas");
+  const caption = document.getElementById("tactaScrollVidCaption");
   if (!stage || !canvas) return;
 
   const frameCount = parseInt(stage.dataset.frameCount, 10);
@@ -113,17 +114,38 @@
      it's a rAF-throttled scroll listener, the same pattern apple.com's
      own scroll-scrubbed sections use. */
   let lastIndex = -1;
+  let revealed = 0;
   let ticking = false;
+
+  /* Caption fully revealed 18% into the scrub, then holds - it's a single
+     piece of supporting copy, not a multi-beat callout, so there's no
+     later point where it needs to fade back out again. */
+  const REVEAL_BY = 0.18;
 
   function update() {
     ticking = false;
     const rect = stage.getBoundingClientRect();
     const scrollable = rect.height - window.innerHeight;
     const progress = scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0;
+
+    /* Forward-only: the frame only advances while scrolling down.
+       Scrolling back up doesn't rewind it - it holds the furthest frame
+       already reached, like a recording rather than a live scroll-position
+       readout (apple.com's own scroll videos behave the same way). Since
+       progress only grows on the way down, just never letting the index
+       (or the caption reveal below) decrease is enough - no separate
+       scroll-direction tracking needed. */
     const index = Math.round(progress * (frameCount - 1));
-    if (index !== lastIndex) {
+    if (index > lastIndex) {
       lastIndex = index;
       drawFrame(index);
+    }
+
+    const nextRevealed = Math.min(1, progress / REVEAL_BY);
+    if (caption && nextRevealed > revealed) {
+      revealed = nextRevealed;
+      caption.style.opacity = String(revealed);
+      caption.style.transform = `translateY(${(1 - revealed) * 16}px)`;
     }
   }
 
