@@ -349,11 +349,12 @@ h1, h2, h3, h4 {
   pointer-events: none;
 }
 
-/* Tacta/Macinà only: a fixed dark-to-transparent scrim pinned to the true
-   top of the screen, behind the notch/Dynamic-Island cutout. Whatever
-   scrolls up underneath it - any section, any photo - fades into it
-   instead of butting up against the cutout with a hard edge, the same
-   soft top vignette most native apps use around that area. Sits below the
+/* Project pages: a fixed scrim pinned to the true top of the screen,
+   behind the notch/Dynamic-Island cutout. Whatever scrolls up underneath
+   it - any section, any photo - fades into it instead of butting up
+   against the cutout with a hard edge: the same top vignette apple.com's
+   own mobile site uses so a scrolled photo dissolves into the page
+   rather than meeting the status bar with a hard edge. Sits below the
    nav's own z-index but above page content; env() height means it's just
    a small constant on non-notch devices instead of doing nothing useful. */
 .top-scrim {
@@ -365,6 +366,12 @@ h1, h2, h3, h4 {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0));
   z-index: 99;
   pointer-events: none;
+}
+
+/* Revo Bike only: same scrim, toned to its own light background instead
+   of black. */
+.top-scrim--light {
+  background: linear-gradient(to bottom, rgba(245, 245, 247, 0.92), rgba(245, 245, 247, 0));
 }
 
 /* Home page only: a persistent glass panel instead of the transparent bar
