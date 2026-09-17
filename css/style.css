@@ -584,7 +584,8 @@ h1, h2, h3, h4 {
   max-height: 620px;
   border-radius: 50%;
   filter: blur(90px);
-  animation: aurora-drift 26s ease-in-out infinite alternate;
+  /* Drift paused with the rest of the site's animations - see .reveal. */
+  /* animation: aurora-drift 26s ease-in-out infinite alternate; */
 }
 
 .aurora__blob--a {
@@ -648,8 +649,9 @@ h1, h2, h3, h4 {
   line-height: 1.08;
   max-width: 16ch;
   margin-inline: auto;
-  opacity: 0;
-  animation: fade-up var(--dur-slow) var(--ease) forwards;
+  /* Entrance animation paused with the rest of the site - see .reveal. */
+  /* opacity: 0;
+  animation: fade-up var(--dur-slow) var(--ease) forwards; */
 }
 
 .hero__tagline {
@@ -658,9 +660,9 @@ h1, h2, h3, h4 {
   margin-inline: auto;
   font-size: clamp(1.1rem, 2.2vw, 1.4rem);
   color: var(--text-muted);
-  opacity: 0;
+  /* opacity: 0;
   animation: fade-up var(--dur-slow) var(--ease) forwards;
-  animation-delay: 0.06s;
+  animation-delay: 0.06s; */
 }
 
 .hero__caption {
@@ -670,9 +672,9 @@ h1, h2, h3, h4 {
   margin-top: 14px;
   font-size: 0.92rem;
   color: var(--text-dim);
-  opacity: 0;
+  /* opacity: 0;
   animation: fade-up var(--dur-slow) var(--ease) forwards;
-  animation-delay: 0.1s;
+  animation-delay: 0.1s; */
 }
 
 @keyframes fade-up {
@@ -695,9 +697,9 @@ h1, h2, h3, h4 {
   justify-content: center;
   gap: 16px;
   margin-top: 28px;
-  opacity: 0;
+  /* opacity: 0;
   animation: fade-up var(--dur-slow) var(--ease) forwards;
-  animation-delay: 0.14s;
+  animation-delay: 0.14s; */
 }
 
 /* ---------- Section shell ---------- */
@@ -730,15 +732,21 @@ section {
   font-size: 1.02rem;
 }
 
+/* Animations paused site-wide for now (nav excluded) - re-enable by
+   restoring the commented-out declarations below once the rest of the
+   site's content work is settled. Markup/JS untouched on purpose: every
+   .reveal class and the IntersectionObserver driving it are still in
+   place, so turning this back on later is just uncommenting these two
+   rules, not re-adding classes across every page again. */
 .reveal {
-  opacity: 0;
+  /* opacity: 0;
   transform: translateY(28px) scale(0.98);
-  transition: opacity 0.8s var(--ease), transform 0.8s var(--spring);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--spring); */
 }
 
 .reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+  /* opacity: 1;
+  transform: translateY(0) scale(1); */
 }
 
 /* ---------- About ---------- */
