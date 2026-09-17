@@ -587,12 +587,12 @@ h1, h2, h3, h4 {
   justify-content: center;
 }
 
-/* Aurora background: large, softly blurred color blobs drifting slowly
-   behind the hero content. Replaces the earlier dot-and-line particle
-   canvas, which read as generic "tech template" noise rather than a
-   deliberate background. Picks up the exact three accent colors used by
-   the project cards below (red, blue, warm grey), so the very first thing
-   on the page already carries the site's real palette. */
+/* Background: a fully white hero with a few very faint, softly blurred
+   blobs instead of the earlier colored aurora wash - that version bled
+   color right up to y:0, directly behind the navbar (the "interferisce
+   con la navbar" the redesign avoids). These sit lower in the hero
+   instead, low enough in opacity that the page still reads as plain
+   white at a glance, with just a hint of depth on closer look. */
 .aurora {
   position: absolute;
   inset: 0;
@@ -608,33 +608,33 @@ h1, h2, h3, h4 {
   max-width: 620px;
   max-height: 620px;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(90px);
   animation: aurora-drift 26s ease-in-out infinite alternate;
 }
 
 .aurora__blob--a {
-  top: -14%;
-  left: -10%;
-  background: radial-gradient(circle, rgba(194, 58, 83, 0.4), transparent 70%);
+  top: 22%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(37, 84, 209, 0.05), transparent 70%);
   animation-duration: 24s;
 }
 
 .aurora__blob--b {
-  top: 4%;
-  right: -14%;
-  background: radial-gradient(circle, rgba(59, 110, 224, 0.38), transparent 70%);
+  top: 34%;
+  right: -16%;
+  background: radial-gradient(circle, rgba(194, 58, 83, 0.04), transparent 70%);
   animation-duration: 30s;
   animation-delay: -6s;
 }
 
 .aurora__blob--c {
-  bottom: -22%;
-  left: 24%;
+  bottom: -14%;
+  left: 26%;
   width: 38vw;
   height: 38vw;
   max-width: 520px;
   max-height: 520px;
-  background: radial-gradient(circle, rgba(138, 143, 153, 0.32), transparent 70%);
+  background: radial-gradient(circle, rgba(20, 19, 15, 0.035), transparent 70%);
   animation-duration: 34s;
   animation-delay: -12s;
 }
