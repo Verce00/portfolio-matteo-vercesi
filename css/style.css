@@ -1806,10 +1806,9 @@ footer {
    compressed <video>) gives frame-accurate scrubbing with no seek lag,
    and sidesteps mobile Safari's autoplay/programmatic-seek restrictions
    entirely. The explanatory copy (formerly its own static section above
-   this one) now arrives as a caption overlaid on the video itself,
-   revealed early in the scrub instead of sitting there already read
-   before the scroll even starts - apple.com's own pattern for these
-   moments pairs the copy with the footage, not before it. */
+   this one) now arrives as a caption overlaid directly on the garment
+   once the sequence reaches it (see project.js), rather than sitting
+   there already read before the scroll even starts. */
 .project-scrollvid {
   background: #000;
 }
@@ -1833,36 +1832,44 @@ footer {
   width: 100%;
   height: 100%;
   display: block;
+  /* Soft top/bottom vignette instead of the video content meeting the
+     viewport edge head-on - the same fade-instead-of-hard-line treatment
+     used elsewhere on the project pages (the notch scrim, the old detail
+     shot's own mask), just applied to both edges here. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
 }
 
-/* Overlaid on the canvas' left edge rather than placed beside it, so the
-   copy and the footage read as one composed shot - the same left-caption
-   apple.com uses over its own product close-ups. Revealed by JS (see
-   project.js) in step with scroll progress, not a CSS transition: its
-   opacity/position is driven by the same scroll-derived value as the
-   frame index, not an independent trigger. */
+/* Sits directly on the garment fabric once the sequence reaches it (see
+   REVEAL_AT_FRAME in project.js) - dark text, no scrim behind it, since
+   the fabric at that point in the sequence is light enough on its own.
+   Lower-left placement keeps it clear of the centered TACTA wordmark and
+   the seam lines converging mid-frame. */
 .project-scrollvid__caption {
   position: absolute;
   left: 0;
   bottom: 0;
   z-index: 1;
-  max-width: min(440px, 86vw);
-  padding: 0 24px clamp(48px, 9vh, 96px);
-  /* Dark toward the caption, clear toward the subject - legible over
-     whatever the frame underneath happens to be, without a hard box. */
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0) 85%);
+  max-width: min(420px, 78vw);
+  padding: 0 28px clamp(56px, 11vh, 110px);
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(10px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
   pointer-events: none;
 }
 
+.project-scrollvid__caption.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .project-scrollvid__caption .eyebrow {
-  color: #fff;
+  color: #17160f;
 }
 
 .project-scrollvid__headline {
   margin-top: 16px;
-  color: #fff;
+  color: #17160f;
   font-size: clamp(1.6rem, 3vw, 2.2rem);
   line-height: 1.15;
 }
@@ -1871,7 +1878,7 @@ footer {
   margin-top: 16px;
   font-size: clamp(0.92rem, 1.4vw, 1.05rem);
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(23, 22, 15, 0.72);
 }
 
 /* ---------- Gallery (two communication shots, side by side) ---------- */

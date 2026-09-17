@@ -114,38 +114,27 @@
      it's a rAF-throttled scroll listener, the same pattern apple.com's
      own scroll-scrubbed sections use. */
   let lastIndex = -1;
-  let revealed = 0;
   let ticking = false;
 
-  /* Caption fully revealed 18% into the scrub, then holds - it's a single
-     piece of supporting copy, not a multi-beat callout, so there's no
-     later point where it needs to fade back out again. */
-  const REVEAL_BY = 0.18;
+  /* Caption tied to a specific frame (25th, 0-indexed) rather than a
+     scroll percentage - it needs to land once the sequence has actually
+     reached the garment, not at some fraction of the scrub that'd drift
+     if the frame count or scroll length changes later. Bidirectional
+     like the video itself: scrubbing back before frame 25 hides it again
+     instead of leaving it stranded on-screen once the footage has moved
+     past the moment it was introduced for. */
+  const REVEAL_AT_FRAME = 24;
 
   function update() {
     ticking = false;
     const rect = stage.getBoundingClientRect();
     const scrollable = rect.height - window.innerHeight;
     const progress = scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0;
-
-    /* Forward-only: the frame only advances while scrolling down.
-       Scrolling back up doesn't rewind it - it holds the furthest frame
-       already reached, like a recording rather than a live scroll-position
-       readout (apple.com's own scroll videos behave the same way). Since
-       progress only grows on the way down, just never letting the index
-       (or the caption reveal below) decrease is enough - no separate
-       scroll-direction tracking needed. */
     const index = Math.round(progress * (frameCount - 1));
-    if (index > lastIndex) {
+    if (index !== lastIndex) {
       lastIndex = index;
       drawFrame(index);
-    }
-
-    const nextRevealed = Math.min(1, progress / REVEAL_BY);
-    if (caption && nextRevealed > revealed) {
-      revealed = nextRevealed;
-      caption.style.opacity = String(revealed);
-      caption.style.transform = `translateY(${(1 - revealed) * 16}px)`;
+      if (caption) caption.classList.toggle("is-visible", index >= REVEAL_AT_FRAME);
     }
   }
 
