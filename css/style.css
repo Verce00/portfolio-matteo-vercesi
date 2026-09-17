@@ -521,11 +521,18 @@ h1, h2, h3, h4 {
   }
 
   .nav__mobile-menu {
-    /* Richer tint + a hardcoded (not --glass-blur) radius: this panel is
-       small and only composited while open, not continuously through
-       scroll like the always-on glass sections, so it can afford a richer
-       blur than the mobile-wide --glass-blur reduction without reintroducing
-       the memory pressure that reduction exists to avoid. */
+    /* Always a dark charcoal glass, deliberately not tied to --nav-fg or
+       the page's own light/dark theme: the same rgba(255,255,255,0.16)
+       tint used to look like proper frosted glass over Tacta's black hero
+       (the backdrop itself supplies the darkness), but over this page's
+       white hero the identical value read as almost nothing - same fill,
+       opposite result, because the panel had no color of its own. Giving
+       it a dark fill it actually owns means it looks the same everywhere,
+       regardless of what's behind it. Hardcoded (not --glass-blur) radius:
+       this panel is small and only composited while open, not continuously
+       through scroll like the always-on glass sections, so it can afford a
+       richer blur than the mobile-wide --glass-blur reduction without
+       reintroducing the memory pressure that reduction exists to avoid. */
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -537,26 +544,15 @@ h1, h2, h3, h4 {
     right: max(14px, calc(env(safe-area-inset-right) + 10px));
     padding: 10px;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(24, 23, 22, 0.82);
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: var(--glass-highlight), 0 24px 48px -16px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: var(--glass-highlight), 0 24px 48px -16px rgba(0, 0, 0, 0.45);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px) scale(0.98);
     transition: opacity var(--dur) var(--spring), transform var(--dur) var(--spring), visibility var(--dur);
-  }
-
-  /* Home page only: the panel's own rgba(255,255,255,...) tint reads fine
-     against a dark section (plenty of contrast), but against this page's
-     white hero the exact same value all but disappears - same fill,
-     effectively invisible for a different reason than "too transparent".
-     A darker border and a heavier shadow keep its edges legible without
-     changing the fill itself. */
-  .nav--glass .nav__mobile-menu {
-    border-color: rgba(20, 19, 15, 0.12);
-    box-shadow: var(--glass-highlight), 0 24px 48px -16px rgba(0, 0, 0, 0.22);
   }
 
   .nav.is-open .nav__mobile-menu {
@@ -570,8 +566,11 @@ h1, h2, h3, h4 {
     align-items: center;
     padding: 12px 14px;
     border-radius: 16px;
-    color: var(--nav-fg);
-    opacity: 0.72;
+    /* Fixed light, not var(--nav-fg): the panel's fill is always dark now
+       regardless of the page's theme, so the text needs to always be
+       light too rather than following the bar's own adaptive color. */
+    color: #f4f4f5;
+    opacity: 0.78;
     font-size: 0.95rem;
     font-weight: 500;
     transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
