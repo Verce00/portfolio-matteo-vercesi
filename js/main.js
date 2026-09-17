@@ -31,7 +31,7 @@
   const darkSections = document.querySelectorAll(".theme-dark");
   if (darkSections.length) {
     const onScreenDark = new Set();
-    const navHeight = 52;
+    const navHeight = 44;
     let darkIO = null;
 
     const buildObserver = () => {
