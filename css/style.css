@@ -349,6 +349,24 @@ h1, h2, h3, h4 {
   pointer-events: none;
 }
 
+/* Tacta/Macinà only: a fixed dark-to-transparent scrim pinned to the true
+   top of the screen, behind the notch/Dynamic-Island cutout. Whatever
+   scrolls up underneath it - any section, any photo - fades into it
+   instead of butting up against the cutout with a hard edge, the same
+   soft top vignette most native apps use around that area. Sits below the
+   nav's own z-index but above page content; env() height means it's just
+   a small constant on non-notch devices instead of doing nothing useful. */
+.top-scrim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top, 0px) + 40px);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0));
+  z-index: 99;
+  pointer-events: none;
+}
+
 /* Home page only: a persistent glass panel instead of the transparent bar
    that just reads through to whatever's scrolled underneath - same liquid
    glass values as .nav__mobile-menu (light tint, strong blur, thin bright
@@ -511,7 +529,7 @@ h1, h2, h3, h4 {
     right: max(14px, calc(env(safe-area-inset-right) + 10px));
     padding: 10px;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.34);
+    background: rgba(255, 255, 255, 0.16);
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.3);
