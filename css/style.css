@@ -1799,16 +1799,55 @@ footer {
   justify-content: center;
 }
 
+/* ---------- Detail (cropped shot + explanation, paired) ---------- */
+.project-detail {
+  background: var(--bg);
+  color: var(--text);
+  padding-block: clamp(64px, 9vw, 100px);
+}
+
+.project-detail__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 6vw, 80px);
+  align-items: center;
+}
+
+.project-detail__img {
+  width: 100%;
+  border-radius: 20px;
+  display: block;
+  -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+}
+
+.project-detail__headline {
+  margin-top: 16px;
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+  line-height: 1.15;
+}
+
+.project-detail__body {
+  margin-top: 20px;
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+@media (max-width: 800px) {
+  .project-detail__grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
 /* ---------- Detail video (scroll-scrubbed frame sequence) ---------- */
 /* Tacta only: a frame-by-frame product close-up advanced by scroll
    position instead of played back - apple.com's own technique for these
    moments. A sequence of plain WebP images drawn to a canvas (not a
    compressed <video>) gives frame-accurate scrubbing with no seek lag,
    and sidesteps mobile Safari's autoplay/programmatic-seek restrictions
-   entirely. The explanatory copy (formerly its own static section above
-   this one) now arrives as a caption overlaid directly on the garment
-   once the sequence reaches it (see project.js), rather than sitting
-   there already read before the scroll even starts. */
+   entirely. */
 .project-scrollvid {
   background: #000;
 }
@@ -1834,51 +1873,10 @@ footer {
   display: block;
   /* Soft top/bottom vignette instead of the video content meeting the
      viewport edge head-on - the same fade-instead-of-hard-line treatment
-     used elsewhere on the project pages (the notch scrim, the old detail
-     shot's own mask), just applied to both edges here. */
+     used elsewhere on the project pages (the notch scrim, the detail
+     shot's own mask above), just applied to both edges here. */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
-}
-
-/* Sits directly on the garment fabric once the sequence reaches it (see
-   REVEAL_AT_FRAME in project.js) - dark text, no scrim behind it, since
-   the fabric at that point in the sequence is light enough on its own.
-   Lower-left placement keeps it clear of the centered TACTA wordmark and
-   the seam lines converging mid-frame. */
-.project-scrollvid__caption {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  z-index: 1;
-  max-width: min(420px, 78vw);
-  padding: 0 28px clamp(56px, 11vh, 110px);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
-  pointer-events: none;
-}
-
-.project-scrollvid__caption.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.project-scrollvid__caption .eyebrow {
-  color: #17160f;
-}
-
-.project-scrollvid__headline {
-  margin-top: 16px;
-  color: #17160f;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  line-height: 1.15;
-}
-
-.project-scrollvid__body {
-  margin-top: 16px;
-  font-size: clamp(0.92rem, 1.4vw, 1.05rem);
-  line-height: 1.6;
-  color: rgba(23, 22, 15, 0.72);
 }
 
 /* ---------- Gallery (two communication shots, side by side) ---------- */

@@ -45,7 +45,6 @@
 
   const stage = document.getElementById("tactaScrollVid");
   const canvas = document.getElementById("tactaScrollVidCanvas");
-  const caption = document.getElementById("tactaScrollVidCaption");
   if (!stage || !canvas) return;
 
   const frameCount = parseInt(stage.dataset.frameCount, 10);
@@ -116,15 +115,6 @@
   let lastIndex = -1;
   let ticking = false;
 
-  /* Caption tied to a specific frame (25th, 0-indexed) rather than a
-     scroll percentage - it needs to land once the sequence has actually
-     reached the garment, not at some fraction of the scrub that'd drift
-     if the frame count or scroll length changes later. Bidirectional
-     like the video itself: scrubbing back before frame 25 hides it again
-     instead of leaving it stranded on-screen once the footage has moved
-     past the moment it was introduced for. */
-  const REVEAL_AT_FRAME = 24;
-
   function update() {
     ticking = false;
     const rect = stage.getBoundingClientRect();
@@ -134,7 +124,6 @@
     if (index !== lastIndex) {
       lastIndex = index;
       drawFrame(index);
-      if (caption) caption.classList.toggle("is-visible", index >= REVEAL_AT_FRAME);
     }
   }
 
