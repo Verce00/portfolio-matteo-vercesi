@@ -521,41 +521,53 @@ h1, h2, h3, h4 {
   }
 
   .nav__mobile-menu {
-    /* Neutral tint, not a fixed dark or light color: the panel shouldn't
-       impose its own color, it should read as a frosted, dimmed version of
-       whatever's actually behind it (dark photo -> dark frosted panel,
-       white hero -> light frosted panel) - which is what "glass" means.
-       The earlier 0.16 already did this correctly in principle; the actual
-       bug was blur(28px) being nowhere near enough to dissolve bold text
-       like "Matteo Vercesi." into an indistinct wash, so it stayed legible
-       and collided with the menu's own labels. A much larger blur radius
-       fixes that directly, instead of papering over it with an opaque
-       fixed-color fill that stops being "glass" at all. Hardcoded (not
-       --glass-blur) radius: this panel is small and only composited while
-       open, not continuously through scroll like the always-on glass
-       sections, so it can afford a much richer blur than the mobile-wide
-       --glass-blur reduction without reintroducing the memory pressure
-       that reduction exists to avoid. */
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    /* Real Liquid-Glass material, not a flat tinted rectangle: a strong
+       blur+saturate so the panel reads as a frosted, dimmed version of
+       whatever's behind it (dark photo -> dark glass, white hero -> light
+       glass - genuine Apple materials do this, e.g. Control Center over a
+       bright vs. dark wallpaper), plus the layered highlights/shadow/sheen
+       below that actually sell "glass" rather than "translucent panel":
+       an inner top highlight for the lit top edge, a soft close shadow and
+       a diffuse far shadow for elevation, and a glossy diagonal sheen via
+       ::before. Hardcoded (not --glass-blur) radius: this panel is small
+       and only composited while open, not continuously through scroll
+       like the always-on glass sections, so it can afford a much richer
+       blur than the mobile-wide --glass-blur reduction without
+       reintroducing the memory pressure that reduction exists to avoid. */
     position: absolute;
     top: calc(100% + 10px);
     /* Same safe-area-aware inset as the bar itself above it, so the menu
        doesn't hang out past the notch/Dynamic-Island cutout in landscape. */
     left: max(14px, calc(env(safe-area-inset-left) + 10px));
     right: max(14px, calc(env(safe-area-inset-right) + 10px));
-    padding: 10px;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(60px) saturate(160%);
-    -webkit-backdrop-filter: blur(60px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: var(--glass-highlight), 0 24px 48px -16px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.32);
+    backdrop-filter: blur(72px) saturate(180%);
+    -webkit-backdrop-filter: blur(72px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.75),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.05),
+      0 10px 20px -10px rgba(0, 0, 0, 0.22),
+      0 30px 60px -20px rgba(0, 0, 0, 0.38);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-8px) scale(0.98);
+    transform: translateY(-8px) scale(0.96);
     transition: opacity var(--dur) var(--spring), transform var(--dur) var(--spring), visibility var(--dur);
+  }
+
+  /* Glossy diagonal sheen, like light catching the top edge of glass. */
+  .nav__mobile-menu::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 42%);
+    mix-blend-mode: overlay;
+    pointer-events: none;
   }
 
   .nav.is-open .nav__mobile-menu {
@@ -565,24 +577,43 @@ h1, h2, h3, h4 {
   }
 
   .nav__mobile-link {
+    /* Concentric radius (outer 28px = this 22px + the panel's 6px inset)
+       is a small, deliberate Apple-HIG-style detail: nested rounded
+       shapes read as "designed together" when their corners share a
+       center rather than an arbitrary smaller radius. */
+    position: relative;
     display: flex;
     align-items: center;
-    padding: 12px 14px;
-    border-radius: 16px;
-    /* Back to the adaptive --nav-fg: the panel's own tint is neutral again
-       (light or dark depending on what's behind it), so the text needs to
-       follow that same light/dark read, same as the bar above it. */
+    padding: 14px 16px;
+    border-radius: 22px;
     color: var(--nav-fg);
-    opacity: 0.78;
+    opacity: 0.82;
     font-size: 0.95rem;
     font-weight: 500;
-    transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+    transition: background var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+  }
+
+  /* Hairline divider between rows instead of a gap, like an iOS/macOS
+     context menu - neutral grey so it stays visible over both a light
+     and a dark-toned panel. */
+  .nav__mobile-link:not(:first-child)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: rgba(128, 128, 128, 0.22);
   }
 
   .nav__mobile-link:hover,
   .nav__mobile-link:focus-visible {
     opacity: 1;
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(128, 128, 128, 0.16);
+  }
+
+  .nav__mobile-link:active {
+    background: rgba(128, 128, 128, 0.26);
   }
 }
 
