@@ -397,8 +397,11 @@ h1, h2, h3, h4 {
   cursor: pointer;
   grid-column: 1;
   justify-self: start;
+  /* No color transition: animating a color derived from --nav-fg on a
+     position:fixed bar occasionally lagged behind fast scroll (it's not
+     a GPU-accelerated property like the bar's own transform), so the
+     light/dark flip now snaps instantly instead. */
   color: var(--nav-fg);
-  transition: color var(--dur-fast) var(--ease);
 }
 
 .nav__logo-mark {
@@ -424,9 +427,10 @@ h1, h2, h3, h4 {
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 0.8rem;
+  /* color intentionally untransitioned - see .nav__logo above. */
   color: var(--nav-fg);
   opacity: 0.72;
-  transition: opacity var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  transition: opacity var(--dur-fast) var(--ease);
 }
 
 .nav__pill:hover,
