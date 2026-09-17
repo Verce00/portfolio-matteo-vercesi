@@ -393,6 +393,24 @@ h1, h2, h3, h4 {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
+/* An extra, stronger fade layered on top of the glass panel's own uniform
+   tint, but only across the true status-bar strip (safe-area-inset-top)
+   behind the clock/battery - same idea as apple.com's own status-bar
+   scrim: content is more dissolved right behind the icons and clears up
+   as it moves down into the visible bar/page, rather than being tinted
+   evenly across the whole bar the way the base glass panel is. Height is
+   0 (invisible, no-op) on any non-notch device. */
+.nav--glass::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
 .nav__logo {
   font-family: var(--font-display);
   font-weight: 500;
