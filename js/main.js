@@ -1,0 +1,155 @@
+(() => {
+  "use strict";
+
+  const nav = document.getElementById("nav");
+  const navToggle = document.getElementById("navToggle");
+  const yearEl = document.getElementById("year");
+  const copyEmailBtn = document.getElementById("copyEmailBtn");
+  const toast = document.getElementById("toast");
+  const scrollSentinel = document.getElementById("scrollSentinel");
+
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  /* Navbar theme: which dark section (if any) is currently behind the bar,
+     via IntersectionObserver instead of polling elementFromPoint on every
+     scroll event. That earlier approach - even rAF-throttled - still ran
+     from a scroll listener, and iOS Safari deprioritizes main-thread JS
+     during momentum/fling scrolling to keep the scroll itself smooth, so
+     the color flip visibly lagged behind the real position on a phone,
+     worst right at the tall hero's own boundary. IntersectionObserver
+     callbacks are scheduled by the browser's own rendering pipeline, not
+     the scroll-event queue, so they keep up during a fling instead of
+     queuing up behind it.
+
+     rootMargin collapses the observed viewport down to a 1px line right
+     at the bar's own bottom edge, so a target only (re)fires exactly when
+     its own edge crosses that line - not merely whenever it's somewhere
+     in view, which for a tall section (the full-height hero, easily) can
+     span a huge scroll range with no new crossing at all. Pixel margins
+     don't auto-rescale on resize the way percentages would, so the
+     observer is rebuilt on resize with freshly computed values instead. */
+  const darkSections = document.querySelectorAll(".theme-dark");
+  if (darkSections.length) {
+    const onScreenDark = new Set();
+    const navHeight = 52;
+    let darkIO = null;
+
+    const buildObserver = () => {
+      if (darkIO) darkIO.disconnect();
+      onScreenDark.clear();
+      const bottomMargin = Math.max(0, window.innerHeight - navHeight - 1);
+      darkIO = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) onScreenDark.add(entry.target);
+            else onScreenDark.delete(entry.target);
+          });
+          nav.classList.toggle("nav--on-dark", onScreenDark.size > 0);
+        },
+        { rootMargin: `-${navHeight}px 0px -${bottomMargin}px 0px`, threshold: 0 }
+      );
+      darkSections.forEach((el) => darkIO.observe(el));
+    };
+
+    buildObserver();
+
+    let resizeRAF = null;
+    window.addEventListener(
+      "resize",
+      () => {
+        if (resizeRAF !== null) return;
+        resizeRAF = requestAnimationFrame(() => {
+          resizeRAF = null;
+          buildObserver();
+        });
+      },
+      { passive: true }
+    );
+  }
+
+  /* Mobile menu: hamburger toggle holding the Progetti/Storia links */
+  if (navToggle) {
+    const closeMobileMenu = () => {
+      nav.classList.remove("is-open");
+      navToggle.setAttribute("aria-expanded", "false");
+    };
+
+    navToggle.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("is-open");
+      navToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    document.querySelectorAll(".nav__mobile-link").forEach((link) => {
+      link.addEventListener("click", closeMobileMenu);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (nav.classList.contains("is-open") && !nav.contains(e.target)) closeMobileMenu();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && nav.classList.contains("is-open")) closeMobileMenu();
+    });
+  }
+
+  /* Project pages only (scrollSentinel only exists there): the navbar
+     slides away once the page is scrolled past its very top - an
+     IntersectionObserver on a 1px sentinel at the top of the page instead
+     of a scroll listener, for the same iOS momentum-scroll responsiveness
+     reason as the dark-section observer above. */
+  if (scrollSentinel && nav) {
+    const scrollIO = new IntersectionObserver(
+      (entries) => {
+        nav.classList.toggle("is-hidden", !entries[0].isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    scrollIO.observe(scrollSentinel);
+  }
+
+  /* Scroll reveal */
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const revealEls = document.querySelectorAll(".reveal");
+
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach((el) => el.classList.add("is-visible"));
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
+    );
+    revealEls.forEach((el) => io.observe(el));
+  }
+
+  /* Copy email to clipboard, with graceful fallback to the mailto default */
+  if (copyEmailBtn) {
+    copyEmailBtn.addEventListener("click", async (e) => {
+      const email = "matteo.vercesi05@gmail.com";
+      if (!navigator.clipboard) return; // let the mailto: link proceed
+      e.preventDefault();
+      try {
+        await navigator.clipboard.writeText(email);
+        showToast();
+      } catch (err) {
+        window.location.href = `mailto:${email}`;
+      }
+    });
+  }
+
+  function showToast() {
+    if (!toast) return;
+    toast.classList.add("is-visible");
+    window.clearTimeout(showToast._t);
+    showToast._t = window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+    }, 2200);
+  }
+
+})();
