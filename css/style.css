@@ -367,23 +367,39 @@ h1, h2, h3, h4 {
   pointer-events: none;
 }
 
-/* Home page only: a persistent glass panel instead of the transparent bar
-   that just reads through to whatever's scrolled underneath - light tint,
-   strong blur, thin bright border, the same liquid-glass material used
-   throughout the nav. */
+/* Home page only: a plain solid white bar instead of a blurred glass
+   panel - no backdrop-filter, no translucency. The visual continuity
+   with scrolled content that the blur used to provide instead comes
+   from .nav-fade right below it: a white-to-transparent gradient that
+   dissolves whatever scrolls up underneath into the bar's own white,
+   rather than reading it (softened) through the bar. */
 .nav--glass {
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  /* Stretches the glass panel itself up behind the notch/Dynamic-Island
-     cutout instead of leaving that strip as flat html/body background -
-     one continuous blurred surface instead of a hard seam between "glass"
-     and "plain page color" right above it. box-sizing:border-box (global
-     reset) keeps the actual nav row at a true 44px: the inset just adds
-     onto the total height as extra padding above the content. */
+  background: #fff;
+  /* Stretches the bar itself up behind the notch/Dynamic-Island cutout
+     instead of leaving that strip as flat html/body background - one
+     continuous white surface instead of a hard seam right above it.
+     box-sizing:border-box (global reset) keeps the actual nav row at a
+     true 44px: the inset just adds onto the total height as extra
+     padding above the content. */
   height: calc(44px + env(safe-area-inset-top, 0px));
   padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Home page only: sits right below .nav--glass, fading its solid white
+   down into the page so scrolled content (e.g. the dark Tacta preview
+   block right under the hero) dissolves smoothly into the bar instead of
+   meeting its bottom edge head-on. Same fixed-scrim mechanism as
+   .top-scrim on the project pages, just white-toned and anchored below
+   the bar instead of black-toned and anchored behind the notch. */
+.nav-fade {
+  position: fixed;
+  top: calc(44px + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+  z-index: 99;
+  pointer-events: none;
 }
 
 .nav__logo {
