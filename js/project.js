@@ -63,7 +63,7 @@
     framesRequested = true;
     for (let i = 0; i < frameCount; i++) {
       const img = new Image();
-      img.src = `${frameBase}${String(i + 1).padStart(4, "0")}.jpg`;
+      img.src = `${frameBase}${String(i + 1).padStart(4, "0")}.webp`;
       frames[i] = img;
     }
     frames[0].addEventListener("load", () => drawFrame(0));
