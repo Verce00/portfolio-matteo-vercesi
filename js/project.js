@@ -52,10 +52,21 @@
   const ctx = canvas.getContext("2d");
 
   const frames = new Array(frameCount);
-  for (let i = 0; i < frameCount; i++) {
-    const img = new Image();
-    img.src = `${frameBase}${String(i + 1).padStart(4, "0")}.jpg`;
-    frames[i] = img;
+  let framesRequested = false;
+
+  /* Deferred until the section is actually approaching (see the
+     IntersectionObserver below) instead of firing all 45 requests
+     (15MB) the instant the page loads, competing with the hero image
+     and everything else above it for bandwidth. */
+  function requestFrames() {
+    if (framesRequested) return;
+    framesRequested = true;
+    for (let i = 0; i < frameCount; i++) {
+      const img = new Image();
+      img.src = `${frameBase}${String(i + 1).padStart(4, "0")}.jpg`;
+      frames[i] = img;
+    }
+    frames[0].addEventListener("load", () => drawFrame(0));
   }
 
   /* Capped at 2x: a 1600px-wide source frame upscaled past 2x would just
@@ -74,6 +85,7 @@
      as the source frames' own compositions intend. */
   function drawFrame(index) {
     let img = frames[index];
+    if (!img) return; // frames not requested yet (section never reached)
     if (!img.complete || !img.naturalWidth) {
       // Sequence still loading: fall back to the nearest already-loaded
       // frame instead of leaving the canvas blank mid-scrub.
@@ -97,8 +109,8 @@
 
   /* Scroll position -> frame index needs the actual scroll offset (not
      just "is this in view"), so unlike the rest of this codebase's
-     scroll-driven UI this can't be an IntersectionObserver - it's a
-     rAF-throttled scroll listener instead, the same pattern apple.com's
+     scroll-driven UI this can't be an IntersectionObserver by itself -
+     it's a rAF-throttled scroll listener, the same pattern apple.com's
      own scroll-scrubbed sections use. */
   let lastIndex = -1;
   let ticking = false;
@@ -123,8 +135,32 @@
   }
 
   resizeCanvas();
-  frames[0].addEventListener("load", () => drawFrame(0));
-  window.addEventListener("scroll", onScroll, { passive: true });
+
+  /* The scroll listener above only needs to run while this section is
+     anywhere near the viewport - left attached for the page's whole
+     scroll lifetime, it forces a layout read (getBoundingClientRect) on
+     every scroll frame site-wide, long after the user has scrolled past
+     it, which is exactly the kind of scroll-listener cost the rest of
+     this codebase avoids via IntersectionObserver elsewhere. A generous
+     rootMargin both attaches the listener and starts the frame downloads
+     a little before the section is actually reached, instead of doing
+     either abruptly right at its edge. */
+  let active = false;
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && !active) {
+        active = true;
+        requestFrames();
+        window.addEventListener("scroll", onScroll, { passive: true });
+        update();
+      } else if (!entries[0].isIntersecting && active) {
+        active = false;
+        window.removeEventListener("scroll", onScroll);
+      }
+    },
+    { rootMargin: "50% 0px 50% 0px" }
+  );
+  io.observe(stage);
 
   let resizeRAF = null;
   window.addEventListener(
