@@ -2,7 +2,6 @@
   "use strict";
 
   const nav = document.getElementById("nav");
-  const navToggle = document.getElementById("navToggle");
   const yearEl = document.getElementById("year");
   const copyEmailBtn = document.getElementById("copyEmailBtn");
   const toast = document.getElementById("toast");
@@ -65,31 +64,6 @@
       },
       { passive: true }
     );
-  }
-
-  /* Mobile menu: hamburger toggle holding the Progetti/Storia links */
-  if (navToggle) {
-    const closeMobileMenu = () => {
-      nav.classList.remove("is-open");
-      navToggle.setAttribute("aria-expanded", "false");
-    };
-
-    navToggle.addEventListener("click", () => {
-      const isOpen = nav.classList.toggle("is-open");
-      navToggle.setAttribute("aria-expanded", String(isOpen));
-    });
-
-    document.querySelectorAll(".nav__mobile-link").forEach((link) => {
-      link.addEventListener("click", closeMobileMenu);
-    });
-
-    document.addEventListener("click", (e) => {
-      if (nav.classList.contains("is-open") && !nav.contains(e.target)) closeMobileMenu();
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && nav.classList.contains("is-open")) closeMobileMenu();
-    });
   }
 
   /* Project pages only (scrollSentinel only exists there): the navbar
