@@ -1841,6 +1841,37 @@ footer {
   }
 }
 
+/* ---------- Detail video (scroll-scrubbed frame sequence) ---------- */
+/* Tacta only: a frame-by-frame product close-up advanced by scroll
+   position instead of played back - apple.com's own technique for these
+   moments. A sequence of plain JPEGs drawn to a canvas (not a compressed
+   <video>) gives frame-accurate scrubbing with no seek lag, and sidesteps
+   mobile Safari's autoplay/programmatic-seek restrictions entirely. */
+.project-scrollvid {
+  background: #000;
+}
+
+.project-scrollvid__stage {
+  /* Scroll distance the sequence plays across - taller reads as a
+     slower, more deliberate scrub per frame. */
+  height: 400vh;
+  position: relative;
+}
+
+.project-scrollvid__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+}
+
+.project-scrollvid__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 /* ---------- Gallery (two communication shots, side by side) ---------- */
 .project-gallery {
   background: var(--bg);
