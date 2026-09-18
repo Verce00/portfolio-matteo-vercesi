@@ -988,6 +988,18 @@ section {
   margin-bottom: clamp(10px, 1.6vw, 20px);
 }
 
+/* Thinner bands on mobile: the desktop clamp()s bottom out at values
+   still sized for a wide canvas, so on a phone each block reads as a
+   tall, slow scroll before the next one arrives. Tightened here rather
+   than by shrinking the product photo itself, which stays the visual
+   focus. */
+@media (max-width: 600px) {
+  .product-block {
+    padding-top: 18px;
+    margin-bottom: 6px;
+  }
+}
+
 .product-block:last-child {
   margin-bottom: 0;
 }
@@ -1024,6 +1036,20 @@ section {
   margin-top: 24px;
 }
 
+@media (max-width: 600px) {
+  .product-block h2 {
+    margin-top: 8px;
+  }
+
+  .product-block__tagline {
+    margin-top: 6px;
+  }
+
+  .product-block__actions {
+    margin-top: 16px;
+  }
+}
+
 /* The CTA always carries the project's own accent, not the page's global
    accent - so it stays correctly branded regardless of the block's own
    light/dark background. */
@@ -1048,8 +1074,12 @@ section {
 }
 
 @media (max-width: 600px) {
+  .product-block__media {
+    margin-top: 10px;
+  }
+
   .product-block__media img {
-    max-width: 200px;
+    max-width: 160px;
   }
 }
 
@@ -1063,7 +1093,7 @@ section {
 
 @media (max-width: 600px) {
   .product-block__media--wide img {
-    max-width: 340px;
+    max-width: 280px;
   }
 }
 
@@ -1080,7 +1110,7 @@ section {
 
 @media (max-width: 600px) {
   .product-block__media-frame {
-    max-width: 200px;
+    max-width: 160px;
   }
 }
 
