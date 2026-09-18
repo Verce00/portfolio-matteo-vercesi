@@ -563,6 +563,8 @@ h1, h2, h3, h4 {
   max-width: 720px;
   margin-inline: auto;
   text-align: center;
+  display: grid;
+  gap: clamp(28px, 6vw, 48px);
 }
 
 .hero__inner .eyebrow {
@@ -572,23 +574,45 @@ h1, h2, h3, h4 {
 /* A real photo, not just type, is what actually reads as "someone's
    here" rather than a placeholder headline - the same portrait that used
    to live further down the page, promoted to the first thing visitors
-   see. Compact and circular-ish (not the old about section's large 4:5
-   editorial crop) so it reads as a confident accent to the headline,
-   not a competing focal point. */
+   see. Large and editorial (the old about section's own 4:5 crop, not a
+   small avatar) so it actually carries visual weight instead of reading
+   as a modest accent. Shown before the text on mobile - the photo is the
+   first thing hitting the screen, headline second - and moves beside it
+   in a proper split layout once there's room (see the min-width query
+   below). */
 .hero__portrait {
-  width: clamp(132px, 18vw, 220px);
-  aspect-ratio: 1;
+  order: -1;
+  width: min(100%, 380px);
+  aspect-ratio: 4 / 5;
   margin-inline: auto;
-  margin-bottom: clamp(20px, 3vw, 32px);
 }
 
-.hero__portrait .glass-frame {
-  border-radius: 50%;
-  padding: 8px;
-}
+@media (min-width: 860px) {
+  .hero__inner {
+    max-width: 1160px;
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    text-align: left;
+    gap: clamp(40px, 5vw, 80px);
+  }
 
-.hero__portrait .glass-frame img {
-  border-radius: 50%;
+  .hero__inner .eyebrow,
+  .hero__actions {
+    justify-content: flex-start;
+  }
+
+  .hero h1,
+  .hero__tagline {
+    margin-inline: 0;
+  }
+
+  .hero__portrait {
+    order: 0;
+    width: 100%;
+    max-width: 480px;
+    margin-inline: 0;
+    justify-self: end;
+  }
 }
 
 /* Background: a fully white hero with a few very faint, softly blurred
@@ -673,7 +697,7 @@ h1, h2, h3, h4 {
 .hero h1 {
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: clamp(2.8rem, 8vw, 5.6rem);
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
   letter-spacing: -0.02em;
   line-height: 1.08;
   max-width: 16ch;
