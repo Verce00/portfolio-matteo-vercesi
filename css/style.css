@@ -1053,6 +1053,20 @@ section {
   }
 }
 
+/* Revo Bike only: this shot is a wide ~2:1 composition (the bike open and
+   folded, side by side), not the square-ish single product shot the
+   other blocks use - the shared 400px/200px caps above would shrink it
+   down to a thin illegible strip, so this widens both. */
+.product-block__media--wide img {
+  max-width: 780px;
+}
+
+@media (max-width: 600px) {
+  .product-block__media--wide img {
+    max-width: 340px;
+  }
+}
+
 /* Tacta only: the wordmark sits behind the shirt photo, cropped to the
    frame so it reads as a subtle relief on the section's own black instead
    of a boxed logo. Sized/positioned relative to this frame (not the wider
