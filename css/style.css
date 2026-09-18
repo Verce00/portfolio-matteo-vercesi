@@ -183,7 +183,6 @@ h1, h2, h3, h4 {
 .glass-frame,
 .swatch,
 .swatch__dot,
-.tool-list li,
 .badge,
 .toast {
   corner-shape: superellipse(2);
@@ -541,9 +540,18 @@ h1, h2, h3, h4 {
 /* ---------- Hero ----------
    Full-bleed, centered: apple.com's own hero pattern - headline, tagline,
    a small plain caption, then a pair of pill buttons, all dead-center. */
+/* Full viewport on load instead of a modest padded band - the first
+   thing a visitor sees is the whole screen making one confident
+   statement, the same "wow" scale apple.com's own hero commands, rather
+   than a few lines of text sitting in the top third of a mostly-empty
+   page. min-height (not height) so tall content on a small phone still
+   grows the section instead of clipping. */
 .hero {
   position: relative;
-  padding-top: clamp(110px, 16vw, 170px);
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding-top: calc(64px + env(safe-area-inset-top, 0px));
   padding-bottom: clamp(56px, 8vw, 96px);
   overflow: hidden;
 }
@@ -551,6 +559,7 @@ h1, h2, h3, h4 {
 .hero__inner {
   position: relative;
   z-index: 1;
+  width: 100%;
   max-width: 720px;
   margin-inline: auto;
   text-align: center;
@@ -558,6 +567,28 @@ h1, h2, h3, h4 {
 
 .hero__inner .eyebrow {
   justify-content: center;
+}
+
+/* A real photo, not just type, is what actually reads as "someone's
+   here" rather than a placeholder headline - the same portrait that used
+   to live further down the page, promoted to the first thing visitors
+   see. Compact and circular-ish (not the old about section's large 4:5
+   editorial crop) so it reads as a confident accent to the headline,
+   not a competing focal point. */
+.hero__portrait {
+  width: clamp(132px, 18vw, 220px);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.hero__portrait .glass-frame {
+  border-radius: 50%;
+  padding: 8px;
+}
+
+.hero__portrait .glass-frame img {
+  border-radius: 50%;
 }
 
 /* Background: a fully white hero with a few very faint, softly blurred
@@ -642,7 +673,7 @@ h1, h2, h3, h4 {
 .hero h1 {
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: clamp(2.6rem, 6.4vw, 4.6rem);
+  font-size: clamp(2.8rem, 8vw, 5.6rem);
   letter-spacing: -0.02em;
   line-height: 1.08;
   max-width: 16ch;
@@ -754,22 +785,6 @@ section {
   border-bottom: 1px solid var(--line);
 }
 
-.about__grid {
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  gap: clamp(32px, 6vw, 90px);
-  align-items: start;
-}
-
-.about__portrait {
-  position: sticky;
-  top: 76px;
-  aspect-ratio: 4 / 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .glass-frame {
   /* Liquid-glass panel: a frosted, translucent pane with a bright rim
      highlight along the top edge (the "sheen" that reads as glass rather
@@ -793,7 +808,7 @@ section {
   transition: box-shadow 400ms var(--spring), border-color 400ms var(--ease);
 }
 
-.about__portrait:hover .glass-frame {
+.hero__portrait:hover .glass-frame {
   border-color: var(--accent);
   box-shadow:
     var(--glass-highlight),
@@ -812,54 +827,42 @@ section {
   filter: grayscale(1) contrast(1.08) brightness(0.96);
 }
 
-.about__bio p {
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
+/* Centered variant of the project pages' own .statement pattern (reusing
+   its headline/body/note/meta typography as-is), rather than the old
+   two-column sticky-photo bio layout that broke the "one big idea,
+   generous space" rhythm every other section on the site uses. Centered
+   (not left-aligned like the project pages' own statement sections)
+   to match its home-page siblings, the hero and the product blocks,
+   which are both centered too. */
+.about__statement {
+  text-align: center;
+  margin-inline: auto;
+}
+
+.about__statement .eyebrow {
+  justify-content: center;
+}
+
+.about__statement .statement__note a {
   color: var(--text);
-  line-height: 1.55;
-  margin-bottom: 26px;
-  max-width: 60ch;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.about__bio p.muted {
-  color: var(--text-muted);
-  font-size: clamp(1rem, 1.6vw, 1.1rem);
+/* Single centered group instead of .statement__meta's own two-column
+   role/tools grid - this section only has one (tools), not both. */
+.about__tools-meta {
+  margin-top: 40px;
+  grid-template-columns: 1fr;
+  max-width: none;
 }
 
-.about__tools {
-  margin-top: 48px;
-  padding-top: 40px;
-  border-top: 1px solid var(--line);
+.about__tools-meta dt {
+  text-align: center;
 }
 
-.about__tools h3 {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  font-weight: 500;
-  margin-bottom: 20px;
-}
-
-.tool-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.tool-list li {
-  border: 1px solid var(--glass-border);
-  background: var(--glass-bg);
-  border-radius: 100px;
-  padding: 9px 18px;
-  font-size: 0.92rem;
-  color: var(--text-muted);
-  transition: border-color var(--dur-fast), color var(--dur-fast);
-}
-
-.tool-list li:hover {
-  border-color: var(--accent);
-  color: var(--text);
+.about__tools-meta .badge-row {
+  justify-content: center;
 }
 
 /* ---------- Work / Projects ---------- */
@@ -1236,17 +1239,6 @@ footer {
 .back-to-top svg {
   width: 14px;
   height: 14px;
-}
-
-/* ---------- About grid responsive ---------- */
-@media (max-width: 900px) {
-  .about__grid {
-    grid-template-columns: 1fr;
-  }
-  .about__portrait {
-    position: static;
-    max-width: 340px;
-  }
 }
 
 /* ---------- Toast (copy email) ---------- */
