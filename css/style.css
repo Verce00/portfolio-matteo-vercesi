@@ -1873,7 +1873,8 @@ footer {
   display: block;
 }
 
-/* Soft top/bottom vignette instead of the video content meeting the
+/* Soft top vignette only (no bottom fade - it read as an unwanted dark
+   band sitting over the fabric) instead of the video content meeting the
    viewport edge head-on. This used to be a mask-image on the canvas
    itself, which forced the browser to recomposite the masked layer on
    every single frame redraw (60 times a second while scrubbing) - a
@@ -1885,7 +1886,7 @@ footer {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, #000 0, transparent 12%, transparent 88%, #000 100%);
+  background: linear-gradient(to bottom, #000 0, transparent 12%);
   pointer-events: none;
 }
 
