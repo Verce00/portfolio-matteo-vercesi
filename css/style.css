@@ -544,15 +544,21 @@ h1, h2, h3, h4 {
    thing a visitor sees is the whole screen making one confident
    statement, the same "wow" scale apple.com's own hero commands, rather
    than a few lines of text sitting in the top third of a mostly-empty
-   page. min-height (not height) so tall content on a small phone still
-   grows the section instead of clipping. */
+   page. Every vertical measurement below (padding, gap, portrait size,
+   type size) is a dvh-aware clamp() rather than a fixed or vw-based one,
+   so the whole hero always fits within one screen with nothing hidden
+   below the fold, on any device - a short landscape phone gets the same
+   guarantee as a tall portrait one, just at smaller values. Standing
+   rule for this section: every future change to the hero has to keep
+   fitting this way, not just look right on the one viewport it was
+   checked on. */
 .hero {
   position: relative;
   min-height: 100dvh;
   display: flex;
   align-items: center;
-  padding-top: calc(64px + env(safe-area-inset-top, 0px));
-  padding-bottom: clamp(56px, 8vw, 96px);
+  padding-top: calc(56px + env(safe-area-inset-top, 0px));
+  padding-bottom: clamp(16px, 4dvh, 72px);
   overflow: hidden;
 }
 
@@ -564,7 +570,7 @@ h1, h2, h3, h4 {
   margin-inline: auto;
   text-align: center;
   display: grid;
-  gap: clamp(28px, 6vw, 48px);
+  gap: clamp(12px, 3dvh, 48px);
 }
 
 .hero__inner .eyebrow {
@@ -579,10 +585,12 @@ h1, h2, h3, h4 {
    as a modest accent. Shown before the text on mobile - the photo is the
    first thing hitting the screen, headline second - and moves beside it
    in a proper split layout once there's room (see the min-width query
-   below). */
+   below). Sized by dvh as well as vw/px (not width alone) - on a narrow
+   but short viewport, width-only sizing lets the 4:5 box grow tall
+   enough to push the CTAs below the fold. */
 .hero__portrait {
   order: -1;
-  width: min(100%, 380px);
+  width: min(100%, 380px, 40dvh);
   aspect-ratio: 4 / 5;
   margin-inline: auto;
 }
@@ -593,7 +601,7 @@ h1, h2, h3, h4 {
     grid-template-columns: 1.05fr 0.95fr;
     align-items: center;
     text-align: left;
-    gap: clamp(40px, 5vw, 80px);
+    gap: clamp(24px, 5vw, 80px);
   }
 
   .hero__inner .eyebrow,
@@ -608,10 +616,74 @@ h1, h2, h3, h4 {
 
   .hero__portrait {
     order: 0;
-    width: 100%;
-    max-width: 480px;
+    width: min(100%, 480px, 46dvh);
     margin-inline: 0;
     justify-self: end;
+  }
+}
+
+/* Short viewport (landscape phones above all, but also a short/tablet-
+   sized browser window): stacking photo-then-text the way the base rules
+   do needs more vertical room than a ~350-430px-tall landscape phone
+   has, no matter how much each piece shrinks. Forcing the side-by-side
+   layout here trades the scarce dimension (height) for the plentiful one
+   (width) instead of continuing to compress a stacked layout past the
+   point it still reads well. */
+@media (max-height: 600px) {
+  .hero {
+    padding-top: calc(48px + env(safe-area-inset-top, 0px));
+    padding-bottom: clamp(10px, 3dvh, 28px);
+  }
+
+  .hero__inner {
+    max-width: 920px;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    text-align: left;
+    gap: clamp(16px, 4vw, 48px);
+  }
+
+  .hero__inner .eyebrow,
+  .hero__actions {
+    justify-content: flex-start;
+  }
+
+  .hero h1,
+  .hero__tagline {
+    margin-inline: 0;
+    max-width: none;
+  }
+
+  .hero__portrait {
+    order: 0;
+    width: min(30vw, 55dvh, 220px);
+    margin-inline: 0;
+    justify-self: end;
+  }
+
+  .hero .eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.5rem, 6dvh, 2.4rem);
+    line-height: 1.1;
+  }
+
+  .hero__tagline {
+    margin-top: 6px;
+    font-size: clamp(0.82rem, 2.6dvh, 1rem);
+  }
+
+  .hero__actions {
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .hero .btn {
+    padding: 9px 18px;
+    min-height: 34px;
+    font-size: 0.82rem;
   }
 }
 
@@ -687,17 +759,20 @@ h1, h2, h3, h4 {
 }
 
 .hero .eyebrow {
-  margin-bottom: 18px;
+  margin-bottom: clamp(8px, 2dvh, 18px);
 }
 
 /* Bold sans-serif display type for the headline - apple.com's own hero
    headline is SF Pro at heavy weight with tight negative tracking, not the
    site's editorial Fraunces italic (kept further down the page as an
-   accent, e.g. the closing CTA). */
+   accent, e.g. the closing CTA). The middle clamp() term takes whichever
+   of vw/dvh is more restrictive, so a narrow phone and a short one both
+   shrink this - a fixed vw-only floor stayed full-size on a short-but-
+   wide window and overflowed the hero past one screen. */
 .hero h1 {
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: clamp(2.8rem, 6vw, 4.8rem);
+  font-size: clamp(2rem, min(6vw, 5.6dvh), 4.8rem);
   letter-spacing: -0.02em;
   line-height: 1.08;
   max-width: 16ch;
@@ -708,10 +783,10 @@ h1, h2, h3, h4 {
 }
 
 .hero__tagline {
-  margin-top: 16px;
+  margin-top: clamp(8px, 2dvh, 16px);
   max-width: 42ch;
   margin-inline: auto;
-  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  font-size: clamp(0.95rem, min(2.2vw, 2.3dvh), 1.4rem);
   color: var(--text-muted);
   /* opacity: 0;
   animation: fade-up var(--dur-slow) var(--ease) forwards;
@@ -749,7 +824,7 @@ h1, h2, h3, h4 {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-top: 28px;
+  margin-top: clamp(14px, 3dvh, 28px);
   /* opacity: 0;
   animation: fade-up var(--dur-slow) var(--ease) forwards;
   animation-delay: 0.14s; */
