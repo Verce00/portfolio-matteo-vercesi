@@ -9,6 +9,49 @@
 
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  /* Equal-height project bands: each project's own image aspect ratio
+     (Tacta's square shot, Revo Bike's wide 2:1, Macinà's own proportions)
+     naturally produces a different content height at any given viewport
+     width, and no single CSS clamp() can track "whatever the tallest one
+     needs" across every width - measuring the tallest block's actual
+     rendered height and applying it to the rest is the only way to
+     guarantee they match exactly. */
+  const productBlocks = document.querySelectorAll(".product-block");
+  if (productBlocks.length > 1) {
+    const equalizeProductBlocks = () => {
+      productBlocks.forEach((el) => {
+        el.style.minHeight = "";
+      });
+      const tallest = Math.max(...Array.from(productBlocks, (el) => el.getBoundingClientRect().height));
+      productBlocks.forEach((el) => {
+        el.style.minHeight = `${tallest}px`;
+      });
+    };
+
+    equalizeProductBlocks();
+
+    // Images are lazy-loaded - re-measure once each has actually loaded,
+    // since a not-yet-loaded image reports the wrong (smaller) height.
+    productBlocks.forEach((block) => {
+      block.querySelectorAll("img").forEach((img) => {
+        if (!img.complete) img.addEventListener("load", equalizeProductBlocks, { once: true });
+      });
+    });
+
+    let blockResizeRAF = null;
+    window.addEventListener(
+      "resize",
+      () => {
+        if (blockResizeRAF !== null) return;
+        blockResizeRAF = requestAnimationFrame(() => {
+          blockResizeRAF = null;
+          equalizeProductBlocks();
+        });
+      },
+      { passive: true }
+    );
+  }
+
   /* Navbar theme: which dark section (if any) is currently behind the bar,
      via IntersectionObserver instead of polling elementFromPoint on every
      scroll event. That earlier approach - even rAF-throttled - still ran

@@ -900,18 +900,22 @@ section {
    (apple.com's own hero band reads short and wide, not tall) - the image is
    sized down to match instead of stretching the band back out. */
 .product-block {
-  /* Top padding only - the photos themselves (macina-01, revobike-01) are
-     already cropped tight at the bottom edge, not full product shots with
-     room to breathe. Adding bottom padding after them left a band of flat
-     color under an abruptly-cropped image, which read as a stray mistake
-     rather than a deliberate frame. Ending the section flush with the
-     image's own bottom edge makes that crop look intentional. */
+  /* Same min-height on every block regardless of each project's own image
+     aspect ratio (Tacta's square shot, Revo Bike's wide 2:1, Macinà's own
+     proportions all produced a different natural height before) - content
+     is vertically centered inside instead, so a naturally shorter block
+     just gets more breathing room top and bottom rather than reading
+     shorter than its neighbors. min-height (not height) so nothing clips
+     if a block's own content ever needs more room than this. */
   position: relative;
   overflow-x: hidden;
   background: var(--bg);
   color: var(--text);
-  padding-top: clamp(28px, 3.5vw, 44px);
-  padding-bottom: 0;
+  min-height: clamp(460px, 58vw, 720px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(28px, 3.5vw, 44px);
   /* A thin sliver of the page's own background shows between blocks
      instead of them touching edge to edge - apple.com keeps that same
      narrow seam between its stacked product sections. */
@@ -925,7 +929,8 @@ section {
    focus. */
 @media (max-width: 600px) {
   .product-block {
-    padding-top: 18px;
+    min-height: clamp(400px, 88vw, 460px);
+    padding-block: 18px;
     margin-bottom: 6px;
   }
 }
