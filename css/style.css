@@ -1871,12 +1871,22 @@ footer {
   width: 100%;
   height: 100%;
   display: block;
-  /* Soft top/bottom vignette instead of the video content meeting the
-     viewport edge head-on - the same fade-instead-of-hard-line treatment
-     used elsewhere on the project pages (the notch scrim, the detail
-     shot's own mask above), just applied to both edges here. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%);
+}
+
+/* Soft top/bottom vignette instead of the video content meeting the
+   viewport edge head-on. This used to be a mask-image on the canvas
+   itself, which forced the browser to recomposite the masked layer on
+   every single frame redraw (60 times a second while scrubbing) - a
+   real, avoidable cost on an element already doing a big drawImage() per
+   frame. A static overlay on top achieves the same look (the section
+   behind is solid black either way) without ever needing to
+   recomposite, since only the canvas underneath it actually changes. */
+.project-scrollvid__sticky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #000 0, transparent 12%, transparent 88%, #000 100%);
+  pointer-events: none;
 }
 
 /* ---------- Gallery (two communication shots, side by side) ---------- */

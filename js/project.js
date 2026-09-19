@@ -124,11 +124,26 @@
   let lastIndex = -1;
   let ticking = false;
 
+  /* The stage's own position, measured once (not on every scroll tick).
+     getBoundingClientRect() forces a synchronous layout recalculation if
+     anything on the page is layout-dirty, and calling it from inside a
+     scroll handler that can fire dozens of times a second was the actual
+     remaining ceiling on frame rate - window.scrollY, used below instead,
+     is just a number the browser already has on hand, no layout pass
+     required. */
+  let stageTop = 0;
+  let stageHeight = 0;
+
+  function measureStage() {
+    const rect = stage.getBoundingClientRect();
+    stageTop = window.scrollY + rect.top;
+    stageHeight = rect.height;
+  }
+
   function update() {
     ticking = false;
-    const rect = stage.getBoundingClientRect();
-    const scrollable = rect.height - window.innerHeight;
-    const progress = scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0;
+    const scrollable = stageHeight - window.innerHeight;
+    const progress = scrollable > 0 ? Math.min(1, Math.max(0, (window.scrollY - stageTop) / scrollable)) : 0;
     const index = Math.round(progress * (frameCount - 1));
     if (index !== lastIndex) {
       lastIndex = index;
@@ -144,6 +159,7 @@
   }
 
   resizeCanvas();
+  measureStage();
 
   /* The scroll listener above only needs to run while this section is
      anywhere near the viewport - left attached for the page's whole
@@ -160,6 +176,7 @@
       if (entries[0].isIntersecting && !active) {
         active = true;
         requestFrames();
+        measureStage(); // re-sync the cached position now that everything above has settled
         window.addEventListener("scroll", onScroll, { passive: true });
         update();
       } else if (!entries[0].isIntersecting && active) {
@@ -179,6 +196,7 @@
       resizeRAF = requestAnimationFrame(() => {
         resizeRAF = null;
         resizeCanvas();
+        measureStage();
         drawFrame(Math.max(0, lastIndex));
       });
     },
