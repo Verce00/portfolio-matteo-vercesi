@@ -943,6 +943,23 @@ section {
   margin-bottom: 0;
 }
 
+/* Tacta and Revo Bike specifically (not Macinà, which keeps the flush-
+   bottom default above): the photo centers in whatever space is left
+   after the text/CTA instead of meeting the band's bottom edge. The text
+   block keeps its natural height at the top (justify-content:flex-start
+   instead of space-between), and the media wrapper grows to absorb the
+   rest of the column, then centers its own child inside that grown box. */
+.product-block--media-center {
+  justify-content: flex-start;
+}
+
+.product-block--media-center .product-block__media {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .product-block__inner {
   position: relative;
   z-index: 1;
