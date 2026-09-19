@@ -902,11 +902,14 @@ section {
 .product-block {
   /* Same min-height on every block regardless of each project's own image
      aspect ratio (Tacta's square shot, Revo Bike's wide 2:1, Macinà's own
-     proportions all produced a different natural height before) - content
-     is vertically centered inside instead, so a naturally shorter block
-     just gets more breathing room top and bottom rather than reading
-     shorter than its neighbors. min-height (not height) so nothing clips
-     if a block's own content ever needs more room than this. */
+     proportions all produced a different natural height before) - see
+     equalizeProductBlocks() in main.js, which measures and applies it.
+     Text stays pinned near the top (its natural position) and the photo
+     is pushed to the very bottom edge via justify-content:space-between,
+     with all of a shorter block's slack absorbed as gap between the two
+     instead of as empty margin above the text and below the photo - the
+     photo's own crop should meet the band's edge, not float centered
+     inside it with visible background on both sides. */
   position: relative;
   overflow-x: hidden;
   background: var(--bg);
@@ -914,8 +917,9 @@ section {
   min-height: clamp(460px, 58vw, 720px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding-block: clamp(28px, 3.5vw, 44px);
+  justify-content: space-between;
+  padding-top: clamp(28px, 3.5vw, 44px);
+  padding-bottom: 0;
   /* A thin sliver of the page's own background shows between blocks
      instead of them touching edge to edge - apple.com keeps that same
      narrow seam between its stacked product sections. */
@@ -930,7 +934,7 @@ section {
 @media (max-width: 600px) {
   .product-block {
     min-height: clamp(400px, 88vw, 460px);
-    padding-block: 18px;
+    padding-top: 18px;
     margin-bottom: 6px;
   }
 }
@@ -1004,7 +1008,7 @@ section {
      block's background rather than boxing it. */
   display: block;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   margin-inline: auto;
 }
 
@@ -1014,7 +1018,7 @@ section {
   }
 
   .product-block__media img {
-    max-width: 160px;
+    max-width: 220px;
   }
 }
 
