@@ -1904,11 +1904,17 @@ footer {
   text-align: center;
 }
 
+/* Stacked, not side by side: the laptop shot is landscape and the phone
+   shot is portrait, so forcing them into equal-width grid columns made
+   the laptop small and the phone oddly narrow/tall - stacking lets each
+   size to its own natural proportions instead, computer large on top
+   (the primary shot), phone smaller below it. */
 .project-gallery__grid {
   margin-top: clamp(32px, 5vw, 56px);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(16px, 2.5vw, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 4vw, 44px);
 }
 
 .project-gallery__grid img {
@@ -1917,10 +1923,12 @@ footer {
   display: block;
 }
 
-@media (max-width: 700px) {
-  .project-gallery__grid {
-    grid-template-columns: 1fr;
-  }
+.project-gallery__img--wide {
+  max-width: 1000px;
+}
+
+.project-gallery__img--narrow {
+  max-width: 340px;
 }
 
 /* ---------- Bleed (full-width image, faded top/bottom, text below) ---------- */
