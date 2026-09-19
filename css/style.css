@@ -939,6 +939,24 @@ section {
   }
 }
 
+/* Tablet and landscape phone: neither the phone-portrait sizing above
+   (too cramped for the extra width here) nor the desktop clamp()s below
+   (sized for a much taller viewport) fit this range - landscape phones
+   especially have very little viewport height to work with, so the same
+   "tall, slow scroll" problem the phone-portrait fix above solves shows
+   up again here even though the width is larger. A dedicated mid-sized
+   tier instead of stretching one of the other two to cover it. Covers up
+   to 1024px so it catches iPad portrait and effectively all phones in
+   landscape (largest is ~926px wide), without touching bigger tablets in
+   landscape, which have desktop-like room to spare. */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .product-block {
+    min-height: clamp(360px, 44vw, 480px);
+    padding-top: clamp(18px, 2.2vw, 26px);
+    margin-bottom: clamp(8px, 1.2vw, 14px);
+  }
+}
+
 .product-block:last-child {
   margin-bottom: 0;
 }
@@ -1026,6 +1044,26 @@ section {
   }
 }
 
+@media (min-width: 601px) and (max-width: 1024px) {
+  .product-block h2 {
+    margin-top: 8px;
+  }
+
+  .product-block__tagline {
+    margin-top: 6px;
+  }
+
+  .product-block__actions {
+    margin-top: 14px;
+  }
+
+  .product-block .btn {
+    padding: 10px 20px;
+    min-height: 38px;
+    font-size: 0.85rem;
+  }
+}
+
 /* The CTA always carries the project's own accent, not the page's global
    accent - so it stays correctly branded regardless of the block's own
    light/dark background. */
@@ -1059,6 +1097,16 @@ section {
   }
 }
 
+@media (min-width: 601px) and (max-width: 1024px) {
+  .product-block__media {
+    margin-top: 10px;
+  }
+
+  .product-block__media img {
+    max-width: 320px;
+  }
+}
+
 /* Revo Bike only: this shot is a wide ~2:1 composition (the bike open and
    folded, side by side), not the square-ish single product shot the
    other blocks use - the shared 400px/200px caps above would shrink it
@@ -1070,6 +1118,12 @@ section {
 @media (max-width: 600px) {
   .product-block__media--wide img {
     max-width: 220px;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .product-block__media--wide img {
+    max-width: 480px;
   }
 }
 
@@ -1087,6 +1141,12 @@ section {
 @media (max-width: 600px) {
   .product-block__media-frame {
     max-width: 130px;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .product-block__media-frame {
+    max-width: 260px;
   }
 }
 
@@ -1110,6 +1170,12 @@ section {
 @media (max-width: 600px) {
   .product-block__media--wordmark {
     margin-top: clamp(24px, 6vw, 36px);
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .product-block__media--wordmark {
+    margin-top: clamp(32px, 4.5vw, 48px);
   }
 }
 
