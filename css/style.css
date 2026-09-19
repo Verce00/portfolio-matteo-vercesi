@@ -914,11 +914,11 @@ section {
   overflow-x: hidden;
   background: var(--bg);
   color: var(--text);
-  min-height: clamp(460px, 58vw, 720px);
+  min-height: clamp(420px, 52vw, 640px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding-top: clamp(28px, 3.5vw, 44px);
+  padding-top: clamp(24px, 3vw, 36px);
   padding-bottom: 0;
   /* A thin sliver of the page's own background shows between blocks
      instead of them touching edge to edge - apple.com keeps that same
@@ -961,18 +961,28 @@ section {
 }
 
 .product-block h2 {
-  margin-top: 14px;
+  margin-top: 10px;
   font-size: clamp(2.2rem, 5vw, 3.6rem);
 }
 
 .product-block__tagline {
-  margin-top: 10px;
+  margin-top: 8px;
   font-size: clamp(1rem, 1.8vw, 1.2rem);
   color: var(--text-muted);
 }
 
 .product-block__actions {
-  margin-top: 24px;
+  margin-top: 18px;
+}
+
+/* Slightly smaller than the shared .btn sizing (44px min tap target) -
+   right for a page's one or two primary actions, but three of these
+   stacked down the page reads heavy at full size. Mobile shrinks it
+   further still, below. */
+.product-block .btn {
+  padding: 11px 22px;
+  min-height: 40px;
+  font-size: 0.88rem;
 }
 
 @media (max-width: 600px) {
@@ -1009,7 +1019,7 @@ section {
 .product-block__media {
   position: relative;
   z-index: 1;
-  margin-top: clamp(16px, 2vw, 24px);
+  margin-top: clamp(12px, 1.6vw, 18px);
 }
 
 .product-block__media img {
@@ -1077,7 +1087,7 @@ section {
    past the shoulder line without running into the CTA button above it -
    scaled down along with the smaller frame above. */
 .product-block__media--wordmark {
-  margin-top: clamp(65px, 9vw, 90px);
+  margin-top: clamp(52px, 7vw, 72px);
 }
 
 @media (max-width: 600px) {
