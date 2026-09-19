@@ -63,7 +63,16 @@
     framesRequested = true;
     for (let i = 0; i < frameCount; i++) {
       const img = new Image();
+      img.decoding = "async";
       img.src = `${frameBase}${String(i + 1).padStart(4, "0")}.webp`;
+      /* This is what actually fixes the stutter, not the scroll handling
+         below: without it, the first time scrubbing reaches a given frame
+         drawImage() has to decode that bitmap synchronously on the main
+         thread before it can paint, which is exactly what a visible
+         per-frame hitch looks like. decode() does that work off-thread as
+         soon as each image finishes downloading, so by the time scrubbing
+         actually reaches it, painting is instant. */
+      if (img.decode) img.decode().catch(() => {});
       frames[i] = img;
     }
     frames[0].addEventListener("load", () => drawFrame(0));
