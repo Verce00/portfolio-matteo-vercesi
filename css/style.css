@@ -1871,6 +1871,12 @@ footer {
   width: 100%;
   height: 100%;
   display: block;
+  /* A plain <img> whose src gets swapped per frame (see project.js),
+     not a <canvas> redrawn via drawImage - once a frame is decoded,
+     swapping to it is a GPU compositor paint the browser already does
+     natively, not a JS-driven pixel copy/rescale on every scroll tick.
+     object-fit:cover replaces the manual cover-fit math a canvas needed. */
+  object-fit: cover;
 }
 
 /* Soft top vignette only (no bottom fade - it read as an unwanted dark

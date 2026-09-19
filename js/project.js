@@ -44,20 +44,19 @@
   "use strict";
 
   const stage = document.getElementById("tactaScrollVid");
-  const canvas = document.getElementById("tactaScrollVidCanvas");
-  if (!stage || !canvas) return;
+  const display = document.getElementById("tactaScrollVidImg");
+  if (!stage || !display) return;
 
   const frameCount = parseInt(stage.dataset.frameCount, 10);
   const frameBase = stage.dataset.frameBase;
-  const ctx = canvas.getContext("2d");
 
   const frames = new Array(frameCount);
   let framesRequested = false;
 
   /* Deferred until the section is actually approaching (see the
-     IntersectionObserver below) instead of firing all 45 requests
-     (15MB) the instant the page loads, competing with the hero image
-     and everything else above it for bandwidth. */
+     IntersectionObserver below) instead of firing all 33 requests the
+     instant the page loads, competing with the hero image and everything
+     else above it for bandwidth. */
   function requestFrames() {
     if (framesRequested) return;
     framesRequested = true;
@@ -65,39 +64,29 @@
       const img = new Image();
       img.decoding = "async";
       img.src = `${frameBase}${String(i + 1).padStart(4, "0")}.webp`;
-      /* This is what actually fixes the stutter, not the scroll handling
-         below: without it, the first time scrubbing reaches a given frame
-         drawImage() has to decode that bitmap synchronously on the main
-         thread before it can paint, which is exactly what a visible
-         per-frame hitch looks like. decode() does that work off-thread as
-         soon as each image finishes downloading, so by the time scrubbing
-         actually reaches it, painting is instant. */
+      /* Pre-decode off the main thread as each frame finishes downloading,
+         so the visible <img> swap below is never the moment a frame gets
+         decoded for the first time. */
       if (img.decode) img.decode().catch(() => {});
       frames[i] = img;
     }
     frames[0].addEventListener("load", () => drawFrame(0));
   }
 
-  /* Capped at 2x: a 1600px-wide source frame upscaled past 2x would just
-     blur, not sharpen, so there's nothing to gain chasing a higher device
-     ratio - only more canvas pixels to paint every frame. */
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-  function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.round(rect.width * dpr);
-    canvas.height = Math.round(rect.height * dpr);
-  }
-
-  /* Cover-fit draw (scale to fill, crop overflow) so the sequence reads
-     as a full-bleed shot regardless of viewport aspect ratio, the same
-     as the source frames' own compositions intend. */
+  /* Swaps the visible <img>'s src to a pre-decoded frame - a GPU
+     compositor paint the browser already does natively for a plain
+     <img>, not a canvas redraw. Earlier this was a <canvas> repainted via
+     drawImage() every frame, which meant every scroll tick paid for a
+     manual cover-fit scale/copy of a ~2-3 megapixel bitmap in JS; a
+     browser-native src swap has no equivalent per-frame cost, since
+     object-fit:cover (in CSS) does the cropping once as a paint property,
+     not as a JS-driven pixel copy repeated on every tick. */
   function drawFrame(index) {
     let img = frames[index];
     if (!img) return; // frames not requested yet (section never reached)
     if (!img.complete || !img.naturalWidth) {
       // Sequence still loading: fall back to the nearest already-loaded
-      // frame instead of leaving the canvas blank mid-scrub.
+      // frame instead of leaving the display blank mid-scrub.
       let fallback = null;
       for (let d = 1; d < frameCount && !fallback; d++) {
         const lo = frames[index - d];
@@ -108,12 +97,7 @@
       if (!fallback) return;
       img = fallback;
     }
-    const cw = canvas.width;
-    const ch = canvas.height;
-    const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
-    const dw = img.naturalWidth * scale;
-    const dh = img.naturalHeight * scale;
-    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    if (display.src !== img.src) display.src = img.src;
   }
 
   /* Scroll position -> frame index needs the actual scroll offset (not
@@ -158,7 +142,6 @@
     }
   }
 
-  resizeCanvas();
   measureStage();
 
   /* The scroll listener above only needs to run while this section is
@@ -195,7 +178,6 @@
       if (resizeRAF !== null) return;
       resizeRAF = requestAnimationFrame(() => {
         resizeRAF = null;
-        resizeCanvas();
         measureStage();
         drawFrame(Math.max(0, lastIndex));
       });
