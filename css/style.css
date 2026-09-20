@@ -573,7 +573,8 @@ h1, h2, h3, h4 {
   gap: clamp(12px, 3dvh, 48px);
 }
 
-.hero__inner .eyebrow {
+.hero__inner .eyebrow,
+.hero__actions {
   justify-content: center;
 }
 
@@ -817,12 +818,14 @@ h1, h2, h3, h4 {
 }
 
 /* Apple's own hero CTA pattern: a solid pill + an outline pill, centered
-   side by side. */
+   side by side. justify-content itself lives earlier (grouped with the
+   eyebrow's) so the min-width/max-height overrides above, which come
+   before this rule in the file, aren't cancelled back out by a later,
+   equal-specificity declaration here. */
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
   gap: 16px;
   margin-top: clamp(14px, 3dvh, 28px);
   /* opacity: 0;
