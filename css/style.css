@@ -1961,6 +1961,31 @@ footer {
   justify-content: center;
 }
 
+/* ---------- Full-bleed photo break ----------
+   A single editorial shot at full viewport width and height, no
+   heading or container - the photo itself is the whole section, the
+   same "let the image be the moment" break apple.com uses between
+   copy-heavy sections. */
+.project-fullbleed {
+  position: relative;
+  min-height: 100vh;
+  padding: 0;
+  overflow: hidden;
+}
+
+.project-fullbleed__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  object-fit: cover;
+  /* Tuned to this specific photo (tacta-03.webp): the model's face sits
+     right-of-center and high in the frame, so a plain 50%/50% center
+     crop cut through her eyes on a narrow/tall viewport where the box's
+     height fully covers the source and only the width gets cropped. */
+  object-position: 66% 15%;
+}
+
 /* ---------- Detail (cropped shot + explanation, paired) ---------- */
 .project-detail {
   background: var(--bg);
