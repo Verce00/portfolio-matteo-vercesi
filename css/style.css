@@ -1552,16 +1552,17 @@ footer {
   pointer-events: none;
 }
 
-/* Revo Bike only: its product shots are clean studio renders on white,
-   not moody editorial photography like Tacta's/Macinà's - a black scrim
-   over a white image would just look muddy, and the project has no
-   white wordmark to sit on a dark overlay anyway. Same bottom-anchored
-   structure as the shared --bg treatment, just inverted to white so it
-   dissolves into the page's own light --bg instead of darkening toward
-   it, with the existing dark logo staying legible throughout. */
+/* Revo Bike only: its hero photo is a bright, sunlit lifestyle shot, not
+   the dark editorial photography Tacta/Macinà use - the shared scrim's
+   own top-of-frame tint (there for a subtle vignette against their
+   already-dark photos) read as an obvious white haze washing out this
+   much brighter one. Faded out completely well before the top instead,
+   so the photo shows clean everywhere except the strip right behind the
+   logo/payoff, where the existing dark logo still needs it to stay
+   legible. */
 .project-hero--bg-light .project-hero__scrim {
   background:
-    linear-gradient(0deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.5) 30%, rgba(255, 255, 255, 0.15) 55%, rgba(255, 255, 255, 0.55) 100%);
+    linear-gradient(0deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.35) 20%, transparent 42%);
 }
 
 .project-hero--bg .container {
