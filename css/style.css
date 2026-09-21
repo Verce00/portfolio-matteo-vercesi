@@ -1498,13 +1498,6 @@ footer {
   text-align: center;
 }
 
-.project-hero__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  justify-content: center;
-}
-
 .project-hero__logo {
   margin-top: 18px;
   display: flex;
@@ -1522,20 +1515,12 @@ footer {
   color: var(--text-muted);
 }
 
-.project-hero__actions {
-  margin-top: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-/* Tacta only: the photo fills the entire hero as a true background instead
-   of sitting in its own block below the text - the section gets an
-   explicit tall height (rather than one driven by its content) for the
-   photo to actually fill, and the text stack sits on top of it via a
-   gradient scrim, not below it. */
+/* Shared full-bleed hero treatment (Tacta, Macinà, Revo Bike): the photo
+   fills the entire hero as a true background instead of sitting in its
+   own block below the text - the section gets an explicit tall height
+   (rather than one driven by its content) for the photo to actually
+   fill, and the text stack sits on top of it via a gradient scrim, not
+   below it. */
 .project-hero--bg {
   min-height: 100vh;
   /* Overrides the base .project-hero's own padding-top/bottom, which was
@@ -1565,6 +1550,18 @@ footer {
   background:
     linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 30%, rgba(0, 0, 0, 0.1) 55%, rgba(0, 0, 0, 0.45) 100%);
   pointer-events: none;
+}
+
+/* Revo Bike only: its product shots are clean studio renders on white,
+   not moody editorial photography like Tacta's/Macinà's - a black scrim
+   over a white image would just look muddy, and the project has no
+   white wordmark to sit on a dark overlay anyway. Same bottom-anchored
+   structure as the shared --bg treatment, just inverted to white so it
+   dissolves into the page's own light --bg instead of darkening toward
+   it, with the existing dark logo staying legible throughout. */
+.project-hero--bg-light .project-hero__scrim {
+  background:
+    linear-gradient(0deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.5) 30%, rgba(255, 255, 255, 0.15) 55%, rgba(255, 255, 255, 0.55) 100%);
 }
 
 .project-hero--bg .container {
@@ -1659,108 +1656,15 @@ footer {
 /* Same per-project branding as .product-block .btn.accent on the overview -
    buttons here should carry the project's own color, not the site's global
    accent blue. */
-.project-hero .btn.accent,
 .project-cta .btn.accent,
 .carousel .btn.accent {
   --btn-bg: var(--project-accent);
 }
 
-.project-hero .btn.outline,
 .project-cta .btn.outline,
 .carousel .btn.outline {
   --btn-fg: var(--project-accent);
   border-color: var(--project-accent);
-}
-
-/* Revo Bike / Macinà: a lighter version of the same idea using their plain
-   SVG wordmark (transparent, so it works on any bg) centered low-opacity
-   behind the shot - no per-letter crop/position tuning like Tacta's raster
-   needed, since it's just a soft full backdrop, not a precise composition. */
-.project-hero__media {
-  position: relative;
-  margin-top: clamp(32px, 5vw, 56px);
-}
-
-@media (max-width: 600px) {
-  /* The two hero buttons can wrap onto their own line at narrow widths,
-     sitting lower than this base margin assumes - a bit more headroom
-     here, on top of the wordmark's own mobile width cap above, covers
-     that stacked-button case too. */
-  .project-hero__media {
-    margin-top: 90px;
-  }
-}
-
-@media (min-width: 601px) {
-  /* .project-hero__wordmark is centered (top: 50%) on this container, so
-     half its own height overhangs above the container's top edge - and
-     that half can be taller than this margin once the wordmark's own
-     width hits its 640px cap (Macinà's wordmark alone needs ~140px of
-     headroom at some widths in this range). Measured empirically like
-     Tacta's equivalent fix above: worst case found across 700-1280px,
-     flat rather than vw-scaled since the overhang doesn't track viewport
-     width once the 640px cap is in play. */
-  .project-hero__media {
-    margin-top: 120px;
-  }
-}
-
-.project-hero__wordmark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(90%, 640px);
-  opacity: 0.5;
-  pointer-events: none;
-  user-select: none;
-  z-index: 0;
-}
-
-@media (max-width: 600px) {
-  /* Unlike .project-hero__shot just below, this had no mobile size step at
-     all - it kept scaling toward its 640px cap as the viewport narrowed
-     toward 600px, so the overhang above the container (it's centered,
-     so half its own height sits above the container's own top edge) grew
-     rather than shrank exactly where the button row is also more likely
-     to wrap onto two lines and sit lower. Capping it explicitly here,
-     matching the shot's own mobile scale-down, is what actually fixes it
-     rather than trying to out-buffer a widening overhang with more margin. */
-  .project-hero__wordmark {
-    width: min(70%, 320px);
-  }
-}
-
-.project-hero__wordmark--subtle {
-  opacity: 0.12;
-}
-
-.project-hero__shot {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  max-width: 460px;
-  margin-inline: auto;
-}
-
-@media (max-width: 600px) {
-  .project-hero__shot {
-    max-width: 240px;
-  }
-}
-
-/* Tacta's hero photo is a full-bleed editorial shot (already black at the
-   edges, no product cutout) rather than a square product render - wider
-   and unconstrained by the square-frame wordmark treatment used elsewhere. */
-.project-hero__shot--wide {
-  max-width: 640px;
-}
-
-@media (max-width: 600px) {
-  .project-hero__shot--wide {
-    max-width: 320px;
-  }
 }
 
 /* ---------- Carousel ---------- */
