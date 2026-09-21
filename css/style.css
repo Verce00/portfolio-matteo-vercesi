@@ -1515,7 +1515,29 @@ footer {
   color: var(--text-muted);
 }
 
-/* Shared full-bleed hero treatment (Tacta, Macinà, Revo Bike): the photo
+/* Revo Bike only: a contained product shot below the text instead of a
+   full-bleed background - its shots run edge to edge with no open
+   background the way Tacta's/Macinà's do, so at hero scale the text
+   would sit on top of the product rather than beside it. Smaller and
+   plain, no scrim needed since it no longer sits under anything. */
+.project-hero__media {
+  margin-top: clamp(32px, 5vw, 56px);
+}
+
+.project-hero__shot {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  margin-inline: auto;
+}
+
+@media (max-width: 600px) {
+  .project-hero__shot {
+    max-width: 280px;
+  }
+}
+
+/* Shared full-bleed hero treatment (Tacta, Macinà): the photo
    fills the entire hero as a true background instead of sitting in its
    own block below the text - the section gets an explicit tall height
    (rather than one driven by its content) for the photo to actually
@@ -1550,21 +1572,6 @@ footer {
   background:
     linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 30%, rgba(0, 0, 0, 0.1) 55%, rgba(0, 0, 0, 0.45) 100%);
   pointer-events: none;
-}
-
-/* Revo Bike only: its hero photo is bright and shot on white, not the
-   dark editorial photography Tacta/Macinà use - the shared scrim's own
-   top-of-frame tint (there for a subtle vignette against their already-
-   dark photos) read as an obvious white haze washing out this much
-   brighter one. Faded out completely well before the top instead, so
-   the photo shows clean up there; the bottom stays strong and reaches
-   higher than the shared scrim's own, since this shot has no empty
-   background behind the logo/payoff the way Tacta's/Macinà's do - the
-   product itself runs right up into the text, so it needs to fade into
-   the page's own white rather than just be gently tinted for contrast. */
-.project-hero--bg-light .project-hero__scrim {
-  background:
-    linear-gradient(0deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.88) 28%, rgba(255, 255, 255, 0.55) 55%, rgba(255, 255, 255, 0.12) 80%, transparent 92%);
 }
 
 .project-hero--bg .container {
