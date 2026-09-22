@@ -9,6 +9,18 @@
 
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  /* Hero project chips: a cursor-tracked spotlight (see .hero__chip::before
+     in CSS) needs the pointer position relative to each chip, which CSS
+     alone can't read - just sets two custom properties per pointermove,
+     no other state. */
+  document.querySelectorAll(".hero__chip").forEach((chip) => {
+    chip.addEventListener("pointermove", (e) => {
+      const rect = chip.getBoundingClientRect();
+      chip.style.setProperty("--x", `${e.clientX - rect.left}px`);
+      chip.style.setProperty("--y", `${e.clientY - rect.top}px`);
+    });
+  });
+
   /* Equal-height project bands: each project's own image aspect ratio
      (Tacta's square shot, Revo Bike's wide 2:1, Macinà's own proportions)
      naturally produces a different content height at any given viewport

@@ -180,7 +180,7 @@ h1, h2, h3, h4 {
    ignored gracefully where the browser doesn't support it yet) */
 .btn,
 .nav,
-.glass-frame,
+.hero__chip,
 .swatch,
 .swatch__dot,
 .badge,
@@ -578,22 +578,25 @@ h1, h2, h3, h4 {
   justify-content: center;
 }
 
-/* A real photo, not just type, is what actually reads as "someone's
-   here" rather than a placeholder headline - the same portrait that used
-   to live further down the page, promoted to the first thing visitors
-   see. Large and editorial (the old about section's own 4:5 crop, not a
-   small avatar) so it actually carries visual weight instead of reading
-   as a modest accent. Shown before the text on mobile - the photo is the
-   first thing hitting the screen, headline second - and moves beside it
-   in a proper split layout once there's room (see the min-width query
+/* A real visual, not just type, is what actually reads as confident
+   rather than a placeholder headline - large and editorial (the old
+   about section's own 4:5 crop, not a small accent) so it carries real
+   weight. Shown before the text on mobile - it's the first thing
+   hitting the screen, headline second - and moves beside it in a
+   proper split layout once there's room (see the min-width query
    below). Sized by dvh as well as vw/px (not width alone) - on a narrow
    but short viewport, width-only sizing lets the 4:5 box grow tall
-   enough to push the CTAs below the fold. */
-.hero__portrait {
+   enough to push the CTAs below the fold. Two interactive project
+   chips instead of a photo - colored with each project's own palette,
+   they double as a preview of the actual work instead of decoration. */
+.hero__visual {
   order: -1;
   width: min(100%, 380px, 40dvh);
   aspect-ratio: 4 / 5;
   margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vw, 16px);
 }
 
 @media (min-width: 860px) {
@@ -615,7 +618,7 @@ h1, h2, h3, h4 {
     margin-inline: 0;
   }
 
-  .hero__portrait {
+  .hero__visual {
     order: 0;
     width: min(100%, 480px, 46dvh);
     margin-inline: 0;
@@ -655,11 +658,12 @@ h1, h2, h3, h4 {
     max-width: none;
   }
 
-  .hero__portrait {
+  .hero__visual {
     order: 0;
     width: min(30vw, 55dvh, 220px);
     margin-inline: 0;
     justify-self: end;
+    flex-direction: row;
   }
 
   .hero .eyebrow {
@@ -685,6 +689,78 @@ h1, h2, h3, h4 {
     padding: 9px 18px;
     min-height: 34px;
     font-size: 0.82rem;
+  }
+}
+
+/* Hero project chips: each one is a real link to a project page, tinted
+   with that project's own colors (--chip-from/--chip-to, set inline per
+   chip) - a cursor-tracked highlight (--x/--y, set by main.js on
+   pointermove) stands in for the liquid-glass sheen the old photo frame
+   had, and the tagline stays hidden until hover so the chip reads as a
+   plain color block at rest, not a busy card. */
+.hero__chip {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(16px, 2.4vw, 24px);
+  border-radius: 28px;
+  overflow: hidden;
+  background: linear-gradient(155deg, var(--chip-from), var(--chip-to));
+  box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.45);
+  transition: transform 400ms var(--spring), box-shadow 400ms var(--ease);
+}
+
+.hero__chip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.28), transparent 55%);
+  opacity: 0;
+  transition: opacity 300ms var(--ease);
+  pointer-events: none;
+}
+
+.hero__chip:hover,
+.hero__chip:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 60px -24px rgba(0, 0, 0, 0.55);
+}
+
+.hero__chip:hover::before,
+.hero__chip:focus-visible::before {
+  opacity: 1;
+}
+
+.hero__chip-name {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.hero__chip-tag {
+  position: relative;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.75);
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 300ms var(--ease), opacity 250ms var(--ease);
+}
+
+.hero__chip:hover .hero__chip-tag,
+.hero__chip:focus-visible .hero__chip-tag {
+  max-height: 40px;
+  opacity: 1;
+}
+
+@media (max-height: 600px) {
+  .hero__chip-tag {
+    display: none;
   }
 }
 
@@ -885,48 +961,6 @@ section {
   background: var(--bg-elevated);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-}
-
-.glass-frame {
-  /* Liquid-glass panel: a frosted, translucent pane with a bright rim
-     highlight along the top edge (the "sheen" that reads as glass rather
-     than a flat tinted card) sitting over a soft accent-tinted glow. */
-  position: relative;
-  width: 100%;
-  height: 100%;
-  padding: 14px;
-  border-radius: 28px;
-  border: 1px solid var(--glass-border);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.4), transparent 40%),
-    linear-gradient(160deg, var(--accent-soft), transparent 55%),
-    var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-  box-shadow:
-    var(--glass-highlight),
-    0 24px 48px -20px rgba(23, 22, 15, 0.35),
-    0 46px 80px -30px rgba(23, 22, 15, 0.25);
-  transition: box-shadow 400ms var(--spring), border-color 400ms var(--ease);
-}
-
-.hero__portrait:hover .glass-frame {
-  border-color: var(--accent);
-  box-shadow:
-    var(--glass-highlight),
-    0 30px 58px -20px rgba(23, 22, 15, 0.4),
-    0 56px 90px -30px rgba(23, 22, 15, 0.28);
-}
-
-.glass-frame img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 18px;
-  /* Desaturated to match the site's neutral/dark palette instead of
-     sitting as a full-color photo against it. */
-  filter: grayscale(1) contrast(1.08) brightness(0.96);
 }
 
 /* Centered variant of the project pages' own .statement pattern (reusing
