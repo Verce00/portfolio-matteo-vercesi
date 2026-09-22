@@ -180,7 +180,7 @@ h1, h2, h3, h4 {
    ignored gracefully where the browser doesn't support it yet) */
 .btn,
 .nav,
-.hero__chip,
+.hero__blob,
 .swatch,
 .swatch__dot,
 .badge,
@@ -692,75 +692,42 @@ h1, h2, h3, h4 {
   }
 }
 
-/* Hero project chips: each one is a real link to a project page, tinted
-   with that project's own colors (--chip-from/--chip-to, set inline per
-   chip) - a cursor-tracked highlight (--x/--y, set by main.js on
-   pointermove) stands in for the liquid-glass sheen the old photo frame
-   had, and the tagline stays hidden until hover so the chip reads as a
-   plain color block at rest, not a busy card. */
-.hero__chip {
+/* Hero blob: a single colorful shape filling the slot the old photo
+   occupied, always slowly drifting through its own gradient on its own
+   (so it reads as alive even before anyone touches it) and tilting
+   toward the cursor on top of that - see the pointermove listener in
+   main.js, which sets --rx/--ry from anywhere in the hero, not just
+   while hovering the shape itself. */
+.hero__blob {
   position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: clamp(16px, 2.4vw, 24px);
-  border-radius: 28px;
-  overflow: hidden;
-  background: linear-gradient(155deg, var(--chip-from), var(--chip-to));
-  box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.45);
-  transition: transform 400ms var(--spring), box-shadow 400ms var(--ease);
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  background:
+    radial-gradient(at 15% 20%, #4d7dff 0%, transparent 55%),
+    radial-gradient(at 85% 15%, #c23a53 0%, transparent 55%),
+    radial-gradient(at 85% 85%, #ffb454 0%, transparent 55%),
+    radial-gradient(at 15% 85%, #2554d1 0%, transparent 55%),
+    #0b0d14;
+  background-size: 200% 200%;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.45);
+  transform: perspective(900px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg));
+  transition: transform 200ms var(--ease);
+  animation: hero-blob-drift 14s ease-in-out infinite;
 }
 
-.hero__chip::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.28), transparent 55%);
-  opacity: 0;
-  transition: opacity 300ms var(--ease);
-  pointer-events: none;
+@keyframes hero-blob-drift {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
 }
 
-.hero__chip:hover,
-.hero__chip:focus-visible {
-  transform: translateY(-4px);
-  box-shadow: 0 32px 60px -24px rgba(0, 0, 0, 0.55);
-}
-
-.hero__chip:hover::before,
-.hero__chip:focus-visible::before {
-  opacity: 1;
-}
-
-.hero__chip-name {
-  position: relative;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
-  color: #fff;
-  letter-spacing: -0.01em;
-}
-
-.hero__chip-tag {
-  position: relative;
-  margin-top: 4px;
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.75);
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 300ms var(--ease), opacity 250ms var(--ease);
-}
-
-.hero__chip:hover .hero__chip-tag,
-.hero__chip:focus-visible .hero__chip-tag {
-  max-height: 40px;
-  opacity: 1;
-}
-
-@media (max-height: 600px) {
-  .hero__chip-tag {
-    display: none;
+@media (prefers-reduced-motion: reduce) {
+  .hero__blob {
+    animation: none;
   }
 }
 

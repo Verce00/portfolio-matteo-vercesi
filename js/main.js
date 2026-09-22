@@ -9,17 +9,24 @@
 
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* Hero project chips: a cursor-tracked spotlight (see .hero__chip::before
-     in CSS) needs the pointer position relative to each chip, which CSS
-     alone can't read - just sets two custom properties per pointermove,
-     no other state. */
-  document.querySelectorAll(".hero__chip").forEach((chip) => {
-    chip.addEventListener("pointermove", (e) => {
-      const rect = chip.getBoundingClientRect();
-      chip.style.setProperty("--x", `${e.clientX - rect.left}px`);
-      chip.style.setProperty("--y", `${e.clientY - rect.top}px`);
+  /* Hero blob: tilts toward the pointer anywhere in the hero (not just
+     while hovering the shape itself) - --rx/--ry drive the rotateX/Y in
+     CSS, cleared back to flat on pointerleave. */
+  const heroBlob = document.querySelector(".hero__blob");
+  const heroEl = document.querySelector(".hero");
+  if (heroBlob && heroEl) {
+    heroEl.addEventListener("pointermove", (e) => {
+      const rect = heroBlob.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      heroBlob.style.setProperty("--rx", `${px * 14}deg`);
+      heroBlob.style.setProperty("--ry", `${py * -14}deg`);
     });
-  });
+    heroEl.addEventListener("pointerleave", () => {
+      heroBlob.style.setProperty("--rx", "0deg");
+      heroBlob.style.setProperty("--ry", "0deg");
+    });
+  }
 
   /* Equal-height project bands: each project's own image aspect ratio
      (Tacta's square shot, Revo Bike's wide 2:1, Macinà's own proportions)
