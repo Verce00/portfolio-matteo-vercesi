@@ -1527,13 +1527,13 @@ footer {
 .project-hero__shot {
   display: block;
   width: 100%;
-  max-width: 460px;
+  max-width: 620px;
   margin-inline: auto;
 }
 
 @media (max-width: 600px) {
   .project-hero__shot {
-    max-width: 280px;
+    max-width: 340px;
   }
 }
 
