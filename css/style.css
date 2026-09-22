@@ -1666,108 +1666,13 @@ footer {
 /* Same per-project branding as .product-block .btn.accent on the overview -
    buttons here should carry the project's own color, not the site's global
    accent blue. */
-.project-cta .btn.accent,
-.carousel .btn.accent {
+.project-cta .btn.accent {
   --btn-bg: var(--project-accent);
 }
 
-.project-cta .btn.outline,
-.carousel .btn.outline {
+.project-cta .btn.outline {
   --btn-fg: var(--project-accent);
   border-color: var(--project-accent);
-}
-
-/* ---------- Carousel ---------- */
-.carousel {
-  position: relative;
-  background: var(--bg-elevated);
-}
-
-.carousel__stickybar {
-  position: sticky;
-  top: 44px;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-block: 16px;
-  background: var(--bg-elevated);
-}
-
-.carousel__stickyname {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.05rem;
-}
-
-.carousel__stickyactions {
-  display: flex;
-  gap: 10px;
-}
-
-.carousel__track {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-inline: var(--gutter);
-  padding-bottom: 8px;
-  scrollbar-width: none;
-}
-
-.carousel__track::-webkit-scrollbar {
-  display: none;
-}
-
-.carousel__card {
-  position: relative;
-  flex: 0 0 auto;
-  width: min(80vw, 720px);
-  aspect-ratio: 4 / 3;
-  border-radius: 20px;
-  overflow: hidden;
-  scroll-snap-align: center;
-  background: var(--bg-card);
-}
-
-.carousel__card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.carousel__caption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 20px 24px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.55), transparent);
-  color: #fff;
-  font-size: 0.95rem;
-  text-align: left;
-}
-
-.carousel__dots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding-block: 24px 40px;
-}
-
-.carousel__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--line-strong);
-  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--spring);
-}
-
-.carousel__dot.is-active {
-  background: var(--project-accent);
-  transform: scale(1.3);
 }
 
 /* ---------- Statement ---------- */
@@ -1968,6 +1873,15 @@ footer {
     grid-template-columns: 1fr;
     gap: 0;
   }
+}
+
+/* Revo Bike only: two of its detail sections carry no image - same
+   type scale as the paired image+text layout above, just a single
+   centered column instead of the two-column grid. */
+.project-detail--text-only .project-detail__grid {
+  display: block;
+  max-width: 60ch;
+  margin-inline: auto;
 }
 
 /* ---------- Detail video (scroll-scrubbed frame sequence) ---------- */
