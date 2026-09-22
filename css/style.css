@@ -1814,6 +1814,20 @@ footer {
   max-width: 480px;
 }
 
+/* Revo Bike only: a third group (materials) alongside role/tools - wider
+   and back to .project__meta's own 3-column layout instead of the
+   2-column one shared by Tacta/Macinà above. */
+.statement__meta--3col {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 640px;
+}
+
+@media (max-width: 720px) {
+  .statement__meta--3col {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Stats ---------- */
 .stats {
   background: var(--bg);
