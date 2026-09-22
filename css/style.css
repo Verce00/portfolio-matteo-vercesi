@@ -1002,6 +1002,12 @@ section {
      instead of them touching edge to edge - apple.com keeps that same
      narrow seam between its stacked product sections. */
   margin-bottom: clamp(10px, 1.6vw, 20px);
+  /* Soft shadow at the top and bottom edges, cast into that seam - each
+     band reads as a raised panel sitting slightly above the page instead
+     of a flat rectangle butted against the next one. */
+  box-shadow:
+    0 -18px 34px -24px rgba(0, 0, 0, 0.4),
+    0 18px 34px -24px rgba(0, 0, 0, 0.4);
 }
 
 /* Thinner bands on mobile: the desktop clamp()s bottom out at values
