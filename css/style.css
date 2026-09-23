@@ -623,16 +623,14 @@ h1, h2, h3, h4 {
   }
 }
 
-/* The hero's own background: a dot grid, the literal structure every
-   layout in the work below is built on, instead of decorative color -
-   see the canvas draw loop in main.js, which brightens and enlarges
-   the dots near the pointer. .hero__cursor is the small accent ring
-   that trails the real pointer with a short lag (same x/y the grid
-   itself reacts to - one shared position drives both, not two
-   unrelated effects) - a live micro-interaction, not decoration,
-   standing in for the kind of interaction-design craft the rest of
-   the site can only describe in text. */
-.hero__grid {
+/* The hero's own background: the logo is a stylized black hole, so the
+   hero itself becomes one - a field of stars drifting on their own,
+   pulled into orbit and swallowed when they stray too close to the
+   pointer (see the particle sim in main.js). .hero__cursor renders the
+   event horizon itself: a dark core with a thin accretion-disk ring,
+   sitting exactly where the pull in the canvas originates - the same
+   x/y drives both, so the visual and the physics agree. */
+.hero__space {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -643,20 +641,23 @@ h1, h2, h3, h4 {
   position: absolute;
   top: 0;
   left: 0;
-  width: 16px;
-  height: 16px;
-  margin: -8px 0 0 -8px;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
   border-radius: 50%;
-  border: 1.5px solid var(--accent);
   z-index: 2;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 200ms var(--ease);
+  transition: opacity 250ms var(--ease);
   transform: translate3d(var(--cx, -100px), var(--cy, -100px), 0);
+  background: radial-gradient(circle, #0a0a0c 0%, #0a0a0c 34%, transparent 38%);
+  box-shadow:
+    0 0 0 1px rgba(37, 84, 209, 0.5),
+    0 0 14px 2px rgba(37, 84, 209, 0.45);
 }
 
 .hero__cursor.is-active {
-  opacity: 0.9;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

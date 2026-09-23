@@ -11,139 +11,142 @@
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* Hero background: a canvas dot grid - the literal structure every
-     layout on this site is built on - that lights up near the pointer,
-     plus a small ring that trails it with a short lag. One shared
-     pointer position drives both, so they read as one system instead
-     of two unrelated effects. Redrawn only on pointermove/resize (no
-     idle render loop), so it costs nothing while the mouse is still;
-     the trailing ring is the one piece that needs a continuous loop,
-     and that loop only runs while the pointer is actually inside the
-     hero. */
+  /* Hero background: the logo is a stylized black hole, so the hero
+     becomes one - a field of stars drifting on their own, pulled into
+     orbit and swallowed when they stray too close to the pointer (the
+     event horizon), then reborn elsewhere. The pointer position drives
+     both the physics here and the .hero__cursor element in CSS, which
+     renders the horizon itself. The animation loop is gated by an
+     IntersectionObserver, so it only runs while the hero is actually
+     on screen - scrolled past, it stops costing anything. */
   const heroEl = document.querySelector(".hero");
-  const gridCanvas = document.getElementById("heroGrid");
+  const spaceCanvas = document.getElementById("heroSpace");
   const cursorEl = document.getElementById("heroCursor");
 
-  if (heroEl && gridCanvas) {
-    const ctx = gridCanvas.getContext("2d");
-    const SPACING = 34;
-    const RADIUS_BASE = 1.1;
-    const RADIUS_MAX = 3.8;
-    const REACH = 210;
+  if (heroEl && spaceCanvas) {
+    const ctx = spaceCanvas.getContext("2d");
+    const hasHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const STAR_DENSITY = 0.00009;
+    const MIN_STARS = 40;
+    const PULL_REACH = 220;
+    const CAPTURE_RADIUS = 16;
+    const DRIFT_SPEED = 0.15;
     const ACCENT = [37, 84, 209];
     const BASE = [20, 19, 15];
 
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
     let width = 0;
     let height = 0;
+    let particles = [];
     let pointer = null;
+    let targetX = 0;
+    let targetY = 0;
+    let curX = 0;
+    let curY = 0;
     let resizeRAF = null;
+    let rafId = null;
+    let onScreen = false;
 
-    function resizeGrid() {
+    function makeParticle() {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = DRIFT_SPEED * (0.4 + Math.random() * 0.8);
+      return {
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: 0.8 + Math.random() * 1.3,
+        baseAlpha: 0.16 + Math.random() * 0.34,
+      };
+    }
+
+    function resize() {
       const rect = heroEl.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
-      gridCanvas.width = Math.round(width * dpr);
-      gridCanvas.height = Math.round(height * dpr);
-      gridCanvas.style.width = `${width}px`;
-      gridCanvas.style.height = `${height}px`;
+      spaceCanvas.width = Math.round(width * dpr);
+      spaceCanvas.height = Math.round(height * dpr);
+      spaceCanvas.style.width = `${width}px`;
+      spaceCanvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      drawGrid();
+      const count = Math.max(MIN_STARS, Math.round(width * height * STAR_DENSITY));
+      particles = Array.from({ length: count }, makeParticle);
+      renderFrame();
     }
 
-    /* Three layers, not one: faint structural lines (the "blueprint" a
-       layout grid actually is), a proximity mesh that only appears
-       between neighboring dots the pointer is close to (a constellation
-       forming and dissolving as you move, not just isolated dots
-       glowing in place), and the dots themselves on top as the mesh's
-       own nodes. */
-    function drawGrid() {
+    function renderFrame() {
       ctx.clearRect(0, 0, width, height);
-      const cols = Math.ceil(width / SPACING) + 1;
-      const rows = Math.ceil(height / SPACING) + 1;
 
-      ctx.strokeStyle = "rgba(20, 19, 15, 0.05)";
-      ctx.lineWidth = 1;
-      for (let i = 0; i < cols; i++) {
-        const x = i * SPACING;
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let j = 0; j < rows; j++) {
-        const y = j * SPACING;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
 
-      const t = [];
-      for (let i = 0; i < cols; i++) {
-        t[i] = [];
-        for (let j = 0; j < rows; j++) {
-          let val = 0;
-          if (pointer) {
-            const dx = i * SPACING - pointer.x;
-            const dy = j * SPACING - pointer.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < REACH) val = 1 - dist / REACH;
+        if (pointer) {
+          const dx = curX - p.x;
+          const dy = curY - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+          if (dist < CAPTURE_RADIUS) {
+            particles[i] = makeParticle();
+            continue;
           }
-          t[i][j] = val;
+          if (dist < PULL_REACH) {
+            const pull = 1 - dist / PULL_REACH;
+            const nx = dx / dist;
+            const ny = dy / dist;
+            /* Radial pull plus a perpendicular component - matter
+               spiraling into a black hole, not just falling straight
+               at it. */
+            p.vx += nx * pull * 0.55 - ny * pull * 0.3;
+            p.vy += ny * pull * 0.55 + nx * pull * 0.3;
+          }
         }
-      }
 
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < -10) p.x = width + 10;
+        else if (p.x > width + 10) p.x = -10;
+        if (p.y < -10) p.y = height + 10;
+        else if (p.y > height + 10) p.y = -10;
+
+        const speed = Math.min(1, Math.hypot(p.vx, p.vy) / 2.2);
+        const alpha = Math.min(1, p.baseAlpha + speed * 0.55);
+        const color = speed > 0.22 ? ACCENT : BASE;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r + speed * 1.3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
+        ctx.fill();
+      }
+    }
+
+    function tick() {
       if (pointer) {
-        ctx.lineWidth = 1;
-        for (let i = 0; i < cols; i++) {
-          for (let j = 0; j < rows; j++) {
-            const tv = t[i][j];
-            if (tv <= 0) continue;
-            const x = i * SPACING;
-            const y = j * SPACING;
-            if (i + 1 < cols && t[i + 1][j] > 0) {
-              ctx.strokeStyle = `rgba(37, 84, 209, ${Math.min(tv, t[i + 1][j]) * 0.55})`;
-              ctx.beginPath();
-              ctx.moveTo(x, y);
-              ctx.lineTo(x + SPACING, y);
-              ctx.stroke();
-            }
-            if (j + 1 < rows && t[i][j + 1] > 0) {
-              ctx.strokeStyle = `rgba(37, 84, 209, ${Math.min(tv, t[i][j + 1]) * 0.55})`;
-              ctx.beginPath();
-              ctx.moveTo(x, y);
-              ctx.lineTo(x, y + SPACING);
-              ctx.stroke();
-            }
-          }
+        curX += (targetX - curX) * 0.16;
+        curY += (targetY - curY) * 0.16;
+        if (cursorEl) {
+          cursorEl.style.setProperty("--cx", `${curX}px`);
+          cursorEl.style.setProperty("--cy", `${curY}px`);
         }
       }
+      renderFrame();
+      if (onScreen && !prefersReducedMotion) rafId = requestAnimationFrame(tick);
+    }
 
-      for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-          const tv = t[i][j];
-          const radius = RADIUS_BASE + (RADIUS_MAX - RADIUS_BASE) * tv;
-          const alpha = 0.14 + 0.7 * tv;
-          const color = tv > 0 ? ACCENT : BASE;
-          ctx.beginPath();
-          ctx.arc(i * SPACING, j * SPACING, radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
-          ctx.fill();
-        }
+    function start() {
+      onScreen = true;
+      if (!rafId && !prefersReducedMotion) rafId = requestAnimationFrame(tick);
+    }
+
+    function stop() {
+      onScreen = false;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
       }
     }
 
-    let drawRAF = null;
-    function scheduleDraw() {
-      if (drawRAF) return;
-      drawRAF = requestAnimationFrame(() => {
-        drawRAF = null;
-        drawGrid();
-      });
-    }
-
-    resizeGrid();
+    resize();
 
     window.addEventListener(
       "resize",
@@ -152,71 +155,42 @@
         resizeRAF = requestAnimationFrame(() => {
           resizeRAF = null;
           dpr = Math.min(window.devicePixelRatio || 1, 2);
-          resizeGrid();
+          resize();
         });
       },
       { passive: true }
     );
 
+    if (!prefersReducedMotion) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) start();
+          else stop();
+        },
+        { threshold: 0 }
+      );
+      io.observe(heroEl);
+    }
+
     /* Touch has no real cursor - a finger dragged across the hero (e.g.
-       mid-scroll) still fires pointermove, and without this check the
-       grid would glow and the ring would trail the finger like a stuck
-       ghost cursor. Real hover + a fine pointer (mouse/trackpad) only. */
-    const hasHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-
+       mid-scroll) still fires pointermove, and without this check every
+       swipe would yank stars around like a stuck ghost cursor. Real
+       hover + a fine pointer (mouse/trackpad) only. */
     if (hasHover && !prefersReducedMotion) {
-      /* Trailing cursor ring: eased toward the real pointer every frame
-         (a plain "snap to position" read as jittery/broken at 60fps for
-         something meant to feel alive) - the loop only runs while the
-         pointer is inside the hero, started on enter and cancelled on
-         leave rather than running site-wide. */
-      let targetX = 0;
-      let targetY = 0;
-      let curX = 0;
-      let curY = 0;
-      let cursorRAF = null;
-
-      function tickCursor() {
-        curX += (targetX - curX) * 0.18;
-        curY += (targetY - curY) * 0.18;
-        if (cursorEl) {
-          cursorEl.style.setProperty("--cx", `${curX}px`);
-          cursorEl.style.setProperty("--cy", `${curY}px`);
-        }
-        cursorRAF = requestAnimationFrame(tickCursor);
-      }
-
       heroEl.addEventListener("pointermove", (e) => {
         const rect = heroEl.getBoundingClientRect();
         pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-        scheduleDraw();
         targetX = pointer.x;
         targetY = pointer.y;
       });
 
       heroEl.addEventListener("pointerenter", () => {
         if (cursorEl) cursorEl.classList.add("is-active");
-        if (!cursorRAF) tickCursor();
       });
 
       heroEl.addEventListener("pointerleave", () => {
         pointer = null;
-        scheduleDraw();
         if (cursorEl) cursorEl.classList.remove("is-active");
-        if (cursorRAF) {
-          cancelAnimationFrame(cursorRAF);
-          cursorRAF = null;
-        }
-      });
-    } else if (hasHover) {
-      heroEl.addEventListener("pointermove", (e) => {
-        const rect = heroEl.getBoundingClientRect();
-        pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-        scheduleDraw();
-      });
-      heroEl.addEventListener("pointerleave", () => {
-        pointer = null;
-        scheduleDraw();
       });
     }
   }
