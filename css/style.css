@@ -643,38 +643,38 @@ h1, h2, h3, h4 {
 
 .aurora__blob {
   position: absolute;
-  width: 46vw;
-  height: 46vw;
-  max-width: 620px;
-  max-height: 620px;
+  width: 58vw;
+  height: 58vw;
+  max-width: 760px;
+  max-height: 760px;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(70px);
   animation: aurora-drift 26s ease-in-out infinite alternate;
 }
 
 .aurora__blob--a {
-  top: 22%;
-  left: -12%;
-  background: radial-gradient(circle, rgba(37, 84, 209, 0.2), transparent 70%);
+  top: 8%;
+  left: -8%;
+  background: radial-gradient(circle, rgba(37, 84, 209, 0.55), transparent 70%);
   animation-duration: 24s;
 }
 
 .aurora__blob--b {
-  top: 34%;
-  right: -16%;
-  background: radial-gradient(circle, rgba(194, 58, 83, 0.16), transparent 70%);
+  top: 20%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(194, 58, 83, 0.45), transparent 70%);
   animation-duration: 30s;
   animation-delay: -6s;
 }
 
 .aurora__blob--c {
-  bottom: -14%;
-  left: 26%;
-  width: 38vw;
-  height: 38vw;
-  max-width: 520px;
-  max-height: 520px;
-  background: radial-gradient(circle, rgba(59, 110, 224, 0.16), transparent 70%);
+  bottom: -22%;
+  left: 18%;
+  width: 50vw;
+  height: 50vw;
+  max-width: 660px;
+  max-height: 660px;
+  background: radial-gradient(circle, rgba(59, 110, 224, 0.4), transparent 70%);
   animation-duration: 34s;
   animation-delay: -12s;
 }
