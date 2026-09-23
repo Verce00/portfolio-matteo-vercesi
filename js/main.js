@@ -11,24 +11,155 @@
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* Hero background: the aurora color fields nudge toward the pointer
-     anywhere in the hero - a small, capped offset (never more than
-     ~24px) so it reads as the background responding to you, not
-     scrolling away underneath the text. */
-  const aurora = document.querySelector(".aurora");
+  /* Hero background: a canvas dot grid - the literal structure every
+     layout on this site is built on - that lights up near the pointer,
+     plus a small ring that trails it with a short lag. One shared
+     pointer position drives both, so they read as one system instead
+     of two unrelated effects. Redrawn only on pointermove/resize (no
+     idle render loop), so it costs nothing while the mouse is still;
+     the trailing ring is the one piece that needs a continuous loop,
+     and that loop only runs while the pointer is actually inside the
+     hero. */
   const heroEl = document.querySelector(".hero");
-  if (aurora && heroEl && !prefersReducedMotion) {
-    heroEl.addEventListener("pointermove", (e) => {
+  const gridCanvas = document.getElementById("heroGrid");
+  const cursorEl = document.getElementById("heroCursor");
+
+  if (heroEl && gridCanvas) {
+    const ctx = gridCanvas.getContext("2d");
+    const SPACING = 36;
+    const RADIUS_BASE = 1.3;
+    const RADIUS_MAX = 3.6;
+    const REACH = 160;
+    const ACCENT = [37, 84, 209];
+    const BASE = [20, 19, 15];
+
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let width = 0;
+    let height = 0;
+    let pointer = null;
+    let resizeRAF = null;
+
+    function resizeGrid() {
       const rect = heroEl.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width - 0.5;
-      const py = (e.clientY - rect.top) / rect.height - 0.5;
-      aurora.style.setProperty("--px", `${px * 32}px`);
-      aurora.style.setProperty("--py", `${py * 32}px`);
-    });
-    heroEl.addEventListener("pointerleave", () => {
-      aurora.style.setProperty("--px", "0px");
-      aurora.style.setProperty("--py", "0px");
-    });
+      width = rect.width;
+      height = rect.height;
+      gridCanvas.width = Math.round(width * dpr);
+      gridCanvas.height = Math.round(height * dpr);
+      gridCanvas.style.width = `${width}px`;
+      gridCanvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawGrid();
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, width, height);
+      const cols = Math.ceil(width / SPACING) + 1;
+      const rows = Math.ceil(height / SPACING) + 1;
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          const x = i * SPACING;
+          const y = j * SPACING;
+          let radius = RADIUS_BASE;
+          let alpha = 0.14;
+          let color = BASE;
+          if (pointer) {
+            const dx = x - pointer.x;
+            const dy = y - pointer.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < REACH) {
+              const t = 1 - dist / REACH;
+              radius = RADIUS_BASE + (RADIUS_MAX - RADIUS_BASE) * t;
+              alpha = 0.14 + 0.7 * t;
+              color = ACCENT;
+            }
+          }
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
+          ctx.fill();
+        }
+      }
+    }
+
+    let drawRAF = null;
+    function scheduleDraw() {
+      if (drawRAF) return;
+      drawRAF = requestAnimationFrame(() => {
+        drawRAF = null;
+        drawGrid();
+      });
+    }
+
+    resizeGrid();
+
+    window.addEventListener(
+      "resize",
+      () => {
+        if (resizeRAF) return;
+        resizeRAF = requestAnimationFrame(() => {
+          resizeRAF = null;
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          resizeGrid();
+        });
+      },
+      { passive: true }
+    );
+
+    if (!prefersReducedMotion) {
+      /* Trailing cursor ring: eased toward the real pointer every frame
+         (a plain "snap to position" read as jittery/broken at 60fps for
+         something meant to feel alive) - the loop only runs while the
+         pointer is inside the hero, started on enter and cancelled on
+         leave rather than running site-wide. */
+      let targetX = 0;
+      let targetY = 0;
+      let curX = 0;
+      let curY = 0;
+      let cursorRAF = null;
+
+      function tickCursor() {
+        curX += (targetX - curX) * 0.18;
+        curY += (targetY - curY) * 0.18;
+        if (cursorEl) {
+          cursorEl.style.setProperty("--cx", `${curX}px`);
+          cursorEl.style.setProperty("--cy", `${curY}px`);
+        }
+        cursorRAF = requestAnimationFrame(tickCursor);
+      }
+
+      heroEl.addEventListener("pointermove", (e) => {
+        const rect = heroEl.getBoundingClientRect();
+        pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        scheduleDraw();
+        targetX = pointer.x;
+        targetY = pointer.y;
+      });
+
+      heroEl.addEventListener("pointerenter", () => {
+        if (cursorEl) cursorEl.classList.add("is-active");
+        if (!cursorRAF) tickCursor();
+      });
+
+      heroEl.addEventListener("pointerleave", () => {
+        pointer = null;
+        scheduleDraw();
+        if (cursorEl) cursorEl.classList.remove("is-active");
+        if (cursorRAF) {
+          cancelAnimationFrame(cursorRAF);
+          cursorRAF = null;
+        }
+      });
+    } else {
+      heroEl.addEventListener("pointermove", (e) => {
+        const rect = heroEl.getBoundingClientRect();
+        pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        scheduleDraw();
+      });
+      heroEl.addEventListener("pointerleave", () => {
+        pointer = null;
+        scheduleDraw();
+      });
+    }
   }
 
   /* Equal-height project bands: each project's own image aspect ratio

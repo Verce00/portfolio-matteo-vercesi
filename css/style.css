@@ -623,78 +623,45 @@ h1, h2, h3, h4 {
   }
 }
 
-/* The hero's own background, not a boxed-in element sitting beside the
-   text - three soft color fields in the same palette as the work below
-   (the site's own accent blue, Tacta's red, Macinà's blue), each
-   drifting slowly on its own and the whole group nudging toward the
-   cursor (see the pointermove listener in main.js, which sets --px/--py
-   on .aurora itself - the individual blobs keep their own independent
-   drift animation, so the two motions compose instead of fighting over
-   one transform). */
-.aurora {
+/* The hero's own background: a dot grid, the literal structure every
+   layout in the work below is built on, instead of decorative color -
+   see the canvas draw loop in main.js, which brightens and enlarges
+   the dots near the pointer. .hero__cursor is the small accent ring
+   that trails the real pointer with a short lag (same x/y the grid
+   itself reacts to - one shared position drives both, not two
+   unrelated effects) - a live micro-interaction, not decoration,
+   standing in for the kind of interaction-design craft the rest of
+   the site can only describe in text. */
+.hero__grid {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
   pointer-events: none;
-  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
-  transition: transform 700ms var(--ease);
 }
 
-.aurora__blob {
+.hero__cursor {
   position: absolute;
-  width: 58vw;
-  height: 58vw;
-  max-width: 760px;
-  max-height: 760px;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
   border-radius: 50%;
-  filter: blur(70px);
-  animation: aurora-drift 26s ease-in-out infinite alternate;
+  border: 1.5px solid var(--accent);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms var(--ease);
+  transform: translate3d(var(--cx, -100px), var(--cy, -100px), 0);
 }
 
-.aurora__blob--a {
-  top: 8%;
-  left: -8%;
-  background: radial-gradient(circle, rgba(37, 84, 209, 0.55), transparent 70%);
-  animation-duration: 24s;
-}
-
-.aurora__blob--b {
-  top: 20%;
-  right: -10%;
-  background: radial-gradient(circle, rgba(194, 58, 83, 0.45), transparent 70%);
-  animation-duration: 30s;
-  animation-delay: -6s;
-}
-
-.aurora__blob--c {
-  bottom: -22%;
-  left: 18%;
-  width: 50vw;
-  height: 50vw;
-  max-width: 660px;
-  max-height: 660px;
-  background: radial-gradient(circle, rgba(59, 110, 224, 0.4), transparent 70%);
-  animation-duration: 34s;
-  animation-delay: -12s;
+.hero__cursor.is-active {
+  opacity: 0.9;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .aurora {
-    transition: none;
-  }
-
-  .aurora__blob {
-    animation: none;
-  }
-}
-
-@keyframes aurora-drift {
-  from {
-    transform: translate(0, 0) scale(1);
-  }
-  to {
-    transform: translate(4%, 6%) scale(1.08);
+  .hero__cursor {
+    display: none;
   }
 }
 
