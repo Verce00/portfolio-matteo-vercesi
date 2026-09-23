@@ -125,7 +125,7 @@ html {
 }
 
 body {
-  background: transparent;
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   font-size: 16px;
@@ -180,6 +180,7 @@ h1, h2, h3, h4 {
    ignored gracefully where the browser doesn't support it yet) */
 .btn,
 .nav,
+.glass-frame,
 .swatch,
 .swatch__dot,
 .badge,
@@ -371,15 +372,14 @@ h1, h2, h3, h4 {
 }
 
 /* Home page only: a persistent glass panel instead of the transparent bar
-   that just reads through to whatever's scrolled underneath - dark tint
-   (the whole home page sits on the same starfield now, not just the
-   hero), strong blur, thin bright rim, the same liquid-glass material
-   used throughout the nav. */
+   that just reads through to whatever's scrolled underneath - light tint,
+   strong blur, thin bright border, the same liquid-glass material used
+   throughout the nav. */
 .nav--glass {
-  background: rgba(8, 9, 12, 0.45);
+  background: rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   /* Stretches the glass panel itself up behind the notch/Dynamic-Island
      cutout instead of leaving that strip as flat html/body background -
      one continuous blurred surface instead of a hard seam between "glass"
@@ -404,7 +404,7 @@ h1, h2, h3, h4 {
   left: 0;
   right: 0;
   height: env(safe-area-inset-top, 0px);
-  background: linear-gradient(to bottom, rgba(8, 9, 12, 0.85), rgba(8, 9, 12, 0));
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
   pointer-events: none;
 }
 
@@ -560,15 +560,11 @@ h1, h2, h3, h4 {
   padding-top: calc(56px + env(safe-area-inset-top, 0px));
   padding-bottom: clamp(16px, 4dvh, 72px);
   overflow: hidden;
-  /* .theme-dark (for the light text) also sets a solid background -
-     overridden back to transparent here so the fixed starfield behind
-     the whole page shows through instead of being painted over. */
-  background: transparent;
 }
 
 .hero__inner {
   position: relative;
-  z-index: 3;
+  z-index: 1;
   width: 100%;
   max-width: 720px;
   margin-inline: auto;
@@ -582,24 +578,88 @@ h1, h2, h3, h4 {
   justify-content: center;
 }
 
+/* A real photo, not just type, is what actually reads as "someone's
+   here" rather than a placeholder headline - the same portrait that used
+   to live further down the page, promoted to the first thing visitors
+   see. Large and editorial (the old about section's own 4:5 crop, not a
+   small avatar) so it actually carries visual weight instead of reading
+   as a modest accent. Shown before the text on mobile - the photo is the
+   first thing hitting the screen, headline second - and moves beside it
+   in a proper split layout once there's room (see the min-width query
+   below). Sized by dvh as well as vw/px (not width alone) - on a narrow
+   but short viewport, width-only sizing lets the 4:5 box grow tall
+   enough to push the CTAs below the fold. */
+.hero__portrait {
+  order: -1;
+  width: min(100%, 380px, 40dvh);
+  aspect-ratio: 4 / 5;
+  margin-inline: auto;
+}
+
 @media (min-width: 860px) {
   .hero__inner {
-    max-width: 820px;
+    max-width: 1160px;
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    text-align: left;
+    gap: clamp(24px, 5vw, 80px);
   }
 
-  .hero h1 {
-    font-size: clamp(3.2rem, 6vw, 5.2rem);
+  .hero__inner .eyebrow,
+  .hero__actions {
+    justify-content: flex-start;
+  }
+
+  .hero h1,
+  .hero__tagline {
+    margin-inline: 0;
+  }
+
+  .hero__portrait {
+    order: 0;
+    width: min(100%, 480px, 46dvh);
+    margin-inline: 0;
+    justify-self: end;
   }
 }
 
 /* Short viewport (landscape phones above all, but also a short/tablet-
-   sized browser window): the text-only hero still needs less vertical
-   room here than a normal portrait phone gets, so padding and type
-   shrink further on top of the fluid clamp()s above. */
+   sized browser window): stacking photo-then-text the way the base rules
+   do needs more vertical room than a ~350-430px-tall landscape phone
+   has, no matter how much each piece shrinks. Forcing the side-by-side
+   layout here trades the scarce dimension (height) for the plentiful one
+   (width) instead of continuing to compress a stacked layout past the
+   point it still reads well. */
 @media (max-height: 600px) {
   .hero {
     padding-top: calc(48px + env(safe-area-inset-top, 0px));
     padding-bottom: clamp(10px, 3dvh, 28px);
+  }
+
+  .hero__inner {
+    max-width: 920px;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    text-align: left;
+    gap: clamp(16px, 4vw, 48px);
+  }
+
+  .hero__inner .eyebrow,
+  .hero__actions {
+    justify-content: flex-start;
+  }
+
+  .hero h1,
+  .hero__tagline {
+    margin-inline: 0;
+    max-width: none;
+  }
+
+  .hero__portrait {
+    order: 0;
+    width: min(30vw, 55dvh, 220px);
+    margin-inline: 0;
+    justify-self: end;
   }
 
   .hero .eyebrow {
@@ -607,7 +667,7 @@ h1, h2, h3, h4 {
   }
 
   .hero h1 {
-    font-size: clamp(1.6rem, 6dvh, 2.6rem);
+    font-size: clamp(1.5rem, 6dvh, 2.4rem);
     line-height: 1.1;
   }
 
@@ -628,115 +688,65 @@ h1, h2, h3, h4 {
   }
 }
 
-/* The page's own background, not just the hero's: the logo is a
-   stylized black hole, so the whole home page sits over one - a field
-   of stars drifting on their own, pulled into orbit and swallowed when
-   they stray too close to the pointer (see the particle sim in
-   main.js). Fixed to the viewport (not the hero) so it stays put
-   behind every section as the page scrolls; every section's own
-   background is translucent glass (see .product-block/.about/footer
-   below) so the stars show through, blurred, underneath. .hero__cursor
-   renders the event horizon itself - a dark core with a thin
-   accretion-disk ring, sitting exactly where the pull in the canvas
-   originates. */
-.hero__nebula {
-  position: fixed;
-  inset: -10%;
-  z-index: -1;
+/* Background: a fully white hero with a few very faint, softly blurred
+   blobs instead of the earlier colored aurora wash - that version bled
+   color right up to y:0, directly behind the navbar (the "interferisce
+   con la navbar" the redesign avoids). These sit lower in the hero
+   instead, low enough in opacity that the page still reads as plain
+   white at a glance, with just a hint of depth on closer look. */
+.aurora {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   overflow: hidden;
   pointer-events: none;
 }
 
-.hero__nebula span {
+.aurora__blob {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  animation: hero-nebula-drift 40s ease-in-out infinite alternate;
-}
-
-.hero__nebula span:nth-child(1) {
-  top: 5%;
-  left: 8%;
   width: 46vw;
   height: 46vw;
   max-width: 620px;
   max-height: 620px;
-  background: radial-gradient(circle, rgba(77, 125, 255, 0.34), transparent 70%);
-  animation-duration: 38s;
+  border-radius: 50%;
+  filter: blur(90px);
+  /* Drift paused with the rest of the site's animations - see .reveal. */
+  /* animation: aurora-drift 26s ease-in-out infinite alternate; */
 }
 
-.hero__nebula span:nth-child(2) {
-  top: 40%;
-  right: 4%;
+.aurora__blob--a {
+  top: 22%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(37, 84, 209, 0.05), transparent 70%);
+  animation-duration: 24s;
+}
+
+.aurora__blob--b {
+  top: 34%;
+  right: -16%;
+  background: radial-gradient(circle, rgba(194, 58, 83, 0.04), transparent 70%);
+  animation-duration: 30s;
+  animation-delay: -6s;
+}
+
+.aurora__blob--c {
+  bottom: -14%;
+  left: 26%;
   width: 38vw;
   height: 38vw;
-  max-width: 500px;
-  max-height: 500px;
-  background: radial-gradient(circle, rgba(194, 58, 83, 0.26), transparent 70%);
-  animation-duration: 46s;
-  animation-delay: -10s;
+  max-width: 520px;
+  max-height: 520px;
+  background: radial-gradient(circle, rgba(20, 19, 15, 0.035), transparent 70%);
+  animation-duration: 34s;
+  animation-delay: -12s;
 }
 
-.hero__nebula span:nth-child(3) {
-  bottom: -6%;
-  left: 30%;
-  width: 42vw;
-  height: 42vw;
-  max-width: 540px;
-  max-height: 540px;
-  background: radial-gradient(circle, rgba(147, 90, 230, 0.26), transparent 70%);
-  animation-duration: 52s;
-  animation-delay: -20s;
-}
-
-@keyframes hero-nebula-drift {
+@keyframes aurora-drift {
   from {
     transform: translate(0, 0) scale(1);
   }
   to {
-    transform: translate(3%, 4%) scale(1.06);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__nebula span {
-    animation: none;
-  }
-}
-
-.hero__space {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.hero__cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border-radius: 50%;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 250ms var(--ease);
-  transform: translate3d(var(--cx, -100px), var(--cy, -100px), 0);
-  background: radial-gradient(circle, #0a0a0c 0%, #0a0a0c 34%, transparent 38%);
-  box-shadow:
-    0 0 0 1px rgba(37, 84, 209, 0.5),
-    0 0 14px 2px rgba(37, 84, 209, 0.45);
-}
-
-.hero__cursor.is-active {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__cursor {
-    display: none;
+    transform: translate(4%, 6%) scale(1.08);
   }
 }
 
@@ -872,12 +882,51 @@ section {
 
 /* ---------- About ---------- */
 .about {
-  position: relative;
-  background: color-mix(in srgb, var(--bg-elevated) 34%, transparent);
-  backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
-  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
+  background: var(--bg-elevated);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+}
+
+.glass-frame {
+  /* Liquid-glass panel: a frosted, translucent pane with a bright rim
+     highlight along the top edge (the "sheen" that reads as glass rather
+     than a flat tinted card) sitting over a soft accent-tinted glow. */
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+  border-radius: 28px;
+  border: 1px solid var(--glass-border);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.4), transparent 40%),
+    linear-gradient(160deg, var(--accent-soft), transparent 55%),
+    var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  box-shadow:
+    var(--glass-highlight),
+    0 24px 48px -20px rgba(23, 22, 15, 0.35),
+    0 46px 80px -30px rgba(23, 22, 15, 0.25);
+  transition: box-shadow 400ms var(--spring), border-color 400ms var(--ease);
+}
+
+.hero__portrait:hover .glass-frame {
+  border-color: var(--accent);
+  box-shadow:
+    var(--glass-highlight),
+    0 30px 58px -20px rgba(23, 22, 15, 0.4),
+    0 56px 90px -30px rgba(23, 22, 15, 0.28);
+}
+
+.glass-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  /* Desaturated to match the site's neutral/dark palette instead of
+     sitting as a full-color photo against it. */
+  filter: grayscale(1) contrast(1.08) brightness(0.96);
 }
 
 /* Centered variant of the project pages' own .statement pattern (reusing
@@ -941,17 +990,7 @@ section {
      inside it with visible background on both sides. */
   position: relative;
   overflow-x: hidden;
-  /* Translucent glass instead of a flat fill - the page's fixed
-     starfield (see .hero__space) shows through, blurred and tinted
-     toward this block's own --bg, the same liquid-glass material the
-     navbar uses. color-mix() keeps this reusable across Tacta's black
-     and Macinà's navy without a separate rgba() override per project. */
-  background: color-mix(in srgb, var(--bg) 34%, transparent);
-  backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
-  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
-  /* A hairline top edge catching light, the same way the navbar's glass
-     panel reads as an actual pane and not just a tinted rectangle. */
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--bg);
   color: var(--text);
   min-height: clamp(420px, 52vw, 640px);
   display: flex;
@@ -1358,37 +1397,8 @@ section {
 
 /* ---------- Footer ---------- */
 footer {
-  position: relative;
-  /* .theme-dark (added for its light text) also sets a solid
-     background - overridden the same way as .product-block/.about, so
-     the starfield stays visible all the way down to the footer instead
-     of the page ending on a flat rectangle. */
-  background: color-mix(in srgb, var(--bg) 34%, transparent);
-  backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
-  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
   border-top: 1px solid var(--line);
   padding-block: 32px;
-}
-
-/* A soft diagonal sheen glancing across the top of every glass panel -
-   the same "light catching the surface" cue liquid glass gets its name
-   from, so each band reads as an actual pane of material sitting above
-   the starfield instead of just a tinted, blurred rectangle. Layered
-   over the color-mix() background, not part of it, so it stays a flat
-   highlight regardless of each project's own tint. */
-.product-block::before,
-.about::before,
-footer::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.04) 18%,
-    transparent 42%
-  );
-  pointer-events: none;
 }
 
 .footer__status {

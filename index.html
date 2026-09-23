@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="it" style="background:#08090c;">
+<html lang="it" style="background:#fff;">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#08090c" />
+<meta name="theme-color" content="#ffffff" />
 <script>
   /* Always land on the hero, never mid-page: without this, a #contact (or
      any other section) hash in the URL makes the browser jump straight
@@ -33,19 +33,6 @@
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-
-<!-- ============ COSMIC BACKGROUND ============
-     Fixed behind the whole page (not scoped to the hero) so every
-     section down to the footer sits over the same starfield - the
-     sections themselves become translucent glass panels instead of
-     solid color, letting it show through. -->
-<div class="hero__nebula" aria-hidden="true">
-  <span></span>
-  <span></span>
-  <span></span>
-</div>
-<canvas class="hero__space" id="heroSpace" aria-hidden="true"></canvas>
-<div class="hero__cursor" id="heroCursor" aria-hidden="true"></div>
 
 <!-- ============ NAV ============ -->
 <nav class="nav nav--glass" id="nav">
@@ -85,7 +72,12 @@
 <main id="top">
 
   <!-- ============ HERO ============ -->
-  <header class="hero theme-dark">
+  <header class="hero">
+    <div class="aurora" aria-hidden="true">
+      <span class="aurora__blob aurora__blob--a"></span>
+      <span class="aurora__blob aurora__blob--b"></span>
+      <span class="aurora__blob aurora__blob--c"></span>
+    </div>
     <div class="container hero__inner">
       <div class="hero__content">
         <span class="eyebrow">Product &amp; Digital Design</span>
@@ -94,6 +86,11 @@
         <div class="hero__actions">
           <a class="btn accent" href="#work"><span>Scopri i progetti</span></a>
           <a class="btn outline" href="#about"><span>Chi sono</span></a>
+        </div>
+      </div>
+      <div class="hero__portrait">
+        <div class="glass-frame">
+          <img src="assets/portrait.webp" alt="Ritratto di Matteo Vercesi" loading="eager">
         </div>
       </div>
     </div>
@@ -164,7 +161,7 @@
 
 </main>
 
-<footer class="theme-dark">
+<footer>
   <div class="footer__status">
     <span class="status-dot"></span>
     <span>Disponibile per nuove opportunità · Torino, IT</span>
