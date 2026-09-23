@@ -9,22 +9,25 @@
 
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* Hero blob: tilts toward the pointer anywhere in the hero (not just
-     while hovering the shape itself) - --rx/--ry drive the rotateX/Y in
-     CSS, cleared back to flat on pointerleave. */
-  const heroBlob = document.querySelector(".hero__blob");
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Hero background: the aurora color fields nudge toward the pointer
+     anywhere in the hero - a small, capped offset (never more than
+     ~24px) so it reads as the background responding to you, not
+     scrolling away underneath the text. */
+  const aurora = document.querySelector(".aurora");
   const heroEl = document.querySelector(".hero");
-  if (heroBlob && heroEl) {
+  if (aurora && heroEl && !prefersReducedMotion) {
     heroEl.addEventListener("pointermove", (e) => {
-      const rect = heroBlob.getBoundingClientRect();
+      const rect = heroEl.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5;
       const py = (e.clientY - rect.top) / rect.height - 0.5;
-      heroBlob.style.setProperty("--rx", `${px * 14}deg`);
-      heroBlob.style.setProperty("--ry", `${py * -14}deg`);
+      aurora.style.setProperty("--px", `${px * 32}px`);
+      aurora.style.setProperty("--py", `${py * 32}px`);
     });
     heroEl.addEventListener("pointerleave", () => {
-      heroBlob.style.setProperty("--rx", "0deg");
-      heroBlob.style.setProperty("--ry", "0deg");
+      aurora.style.setProperty("--px", "0px");
+      aurora.style.setProperty("--py", "0px");
     });
   }
 
@@ -144,7 +147,6 @@
   }
 
   /* Scroll reveal */
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const revealEls = document.querySelectorAll(".reveal");
 
   if (prefersReducedMotion || !("IntersectionObserver" in window)) {

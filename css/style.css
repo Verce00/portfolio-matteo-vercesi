@@ -180,7 +180,6 @@ h1, h2, h3, h4 {
    ignored gracefully where the browser doesn't support it yet) */
 .btn,
 .nav,
-.hero__blob,
 .swatch,
 .swatch__dot,
 .badge,
@@ -578,92 +577,24 @@ h1, h2, h3, h4 {
   justify-content: center;
 }
 
-/* A real visual, not just type, is what actually reads as confident
-   rather than a placeholder headline - large and editorial (the old
-   about section's own 4:5 crop, not a small accent) so it carries real
-   weight. Shown before the text on mobile - it's the first thing
-   hitting the screen, headline second - and moves beside it in a
-   proper split layout once there's room (see the min-width query
-   below). Sized by dvh as well as vw/px (not width alone) - on a narrow
-   but short viewport, width-only sizing lets the 4:5 box grow tall
-   enough to push the CTAs below the fold. Two interactive project
-   chips instead of a photo - colored with each project's own palette,
-   they double as a preview of the actual work instead of decoration. */
-.hero__visual {
-  order: -1;
-  width: min(100%, 380px, 40dvh);
-  aspect-ratio: 4 / 5;
-  margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(10px, 1.6vw, 16px);
-}
-
 @media (min-width: 860px) {
   .hero__inner {
-    max-width: 1160px;
-    grid-template-columns: 1.05fr 0.95fr;
-    align-items: center;
-    text-align: left;
-    gap: clamp(24px, 5vw, 80px);
+    max-width: 820px;
   }
 
-  .hero__inner .eyebrow,
-  .hero__actions {
-    justify-content: flex-start;
-  }
-
-  .hero h1,
-  .hero__tagline {
-    margin-inline: 0;
-  }
-
-  .hero__visual {
-    order: 0;
-    width: min(100%, 480px, 46dvh);
-    margin-inline: 0;
-    justify-self: end;
+  .hero h1 {
+    font-size: clamp(3.2rem, 6vw, 5.2rem);
   }
 }
 
 /* Short viewport (landscape phones above all, but also a short/tablet-
-   sized browser window): stacking photo-then-text the way the base rules
-   do needs more vertical room than a ~350-430px-tall landscape phone
-   has, no matter how much each piece shrinks. Forcing the side-by-side
-   layout here trades the scarce dimension (height) for the plentiful one
-   (width) instead of continuing to compress a stacked layout past the
-   point it still reads well. */
+   sized browser window): the text-only hero still needs less vertical
+   room here than a normal portrait phone gets, so padding and type
+   shrink further on top of the fluid clamp()s above. */
 @media (max-height: 600px) {
   .hero {
     padding-top: calc(48px + env(safe-area-inset-top, 0px));
     padding-bottom: clamp(10px, 3dvh, 28px);
-  }
-
-  .hero__inner {
-    max-width: 920px;
-    grid-template-columns: 1.1fr 0.9fr;
-    align-items: center;
-    text-align: left;
-    gap: clamp(16px, 4vw, 48px);
-  }
-
-  .hero__inner .eyebrow,
-  .hero__actions {
-    justify-content: flex-start;
-  }
-
-  .hero h1,
-  .hero__tagline {
-    margin-inline: 0;
-    max-width: none;
-  }
-
-  .hero__visual {
-    order: 0;
-    width: min(30vw, 55dvh, 220px);
-    margin-inline: 0;
-    justify-self: end;
-    flex-direction: row;
   }
 
   .hero .eyebrow {
@@ -671,7 +602,7 @@ h1, h2, h3, h4 {
   }
 
   .hero h1 {
-    font-size: clamp(1.5rem, 6dvh, 2.4rem);
+    font-size: clamp(1.6rem, 6dvh, 2.6rem);
     line-height: 1.1;
   }
 
@@ -692,57 +623,22 @@ h1, h2, h3, h4 {
   }
 }
 
-/* Hero blob: a single colorful shape filling the slot the old photo
-   occupied, always slowly drifting through its own gradient on its own
-   (so it reads as alive even before anyone touches it) and tilting
-   toward the cursor on top of that - see the pointermove listener in
-   main.js, which sets --rx/--ry from anywhere in the hero, not just
-   while hovering the shape itself. */
-.hero__blob {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 32px;
-  background:
-    radial-gradient(at 15% 20%, #4d7dff 0%, transparent 55%),
-    radial-gradient(at 85% 15%, #c23a53 0%, transparent 55%),
-    radial-gradient(at 85% 85%, #ffb454 0%, transparent 55%),
-    radial-gradient(at 15% 85%, #2554d1 0%, transparent 55%),
-    #0b0d14;
-  background-size: 200% 200%;
-  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.45);
-  transform: perspective(900px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg));
-  transition: transform 200ms var(--ease);
-  animation: hero-blob-drift 14s ease-in-out infinite;
-}
-
-@keyframes hero-blob-drift {
-  0%, 100% {
-    background-position: 0% 0%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__blob {
-    animation: none;
-  }
-}
-
-/* Background: a fully white hero with a few very faint, softly blurred
-   blobs instead of the earlier colored aurora wash - that version bled
-   color right up to y:0, directly behind the navbar (the "interferisce
-   con la navbar" the redesign avoids). These sit lower in the hero
-   instead, low enough in opacity that the page still reads as plain
-   white at a glance, with just a hint of depth on closer look. */
+/* The hero's own background, not a boxed-in element sitting beside the
+   text - three soft color fields in the same palette as the work below
+   (the site's own accent blue, Tacta's red, Macinà's blue), each
+   drifting slowly on its own and the whole group nudging toward the
+   cursor (see the pointermove listener in main.js, which sets --px/--py
+   on .aurora itself - the individual blobs keep their own independent
+   drift animation, so the two motions compose instead of fighting over
+   one transform). */
 .aurora {
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transition: transform 700ms var(--ease);
 }
 
 .aurora__blob {
@@ -753,21 +649,20 @@ h1, h2, h3, h4 {
   max-height: 620px;
   border-radius: 50%;
   filter: blur(90px);
-  /* Drift paused with the rest of the site's animations - see .reveal. */
-  /* animation: aurora-drift 26s ease-in-out infinite alternate; */
+  animation: aurora-drift 26s ease-in-out infinite alternate;
 }
 
 .aurora__blob--a {
   top: 22%;
   left: -12%;
-  background: radial-gradient(circle, rgba(37, 84, 209, 0.05), transparent 70%);
+  background: radial-gradient(circle, rgba(37, 84, 209, 0.2), transparent 70%);
   animation-duration: 24s;
 }
 
 .aurora__blob--b {
   top: 34%;
   right: -16%;
-  background: radial-gradient(circle, rgba(194, 58, 83, 0.04), transparent 70%);
+  background: radial-gradient(circle, rgba(194, 58, 83, 0.16), transparent 70%);
   animation-duration: 30s;
   animation-delay: -6s;
 }
@@ -779,9 +674,19 @@ h1, h2, h3, h4 {
   height: 38vw;
   max-width: 520px;
   max-height: 520px;
-  background: radial-gradient(circle, rgba(20, 19, 15, 0.035), transparent 70%);
+  background: radial-gradient(circle, rgba(59, 110, 224, 0.16), transparent 70%);
   animation-duration: 34s;
   animation-delay: -12s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora {
+    transition: none;
+  }
+
+  .aurora__blob {
+    animation: none;
+  }
 }
 
 @keyframes aurora-drift {
