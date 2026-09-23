@@ -657,22 +657,22 @@ h1, h2, h3, h4 {
 .hero__nebula span:nth-child(1) {
   top: 5%;
   left: 8%;
-  width: 42vw;
-  height: 42vw;
-  max-width: 560px;
-  max-height: 560px;
-  background: radial-gradient(circle, rgba(77, 125, 255, 0.22), transparent 70%);
+  width: 46vw;
+  height: 46vw;
+  max-width: 620px;
+  max-height: 620px;
+  background: radial-gradient(circle, rgba(77, 125, 255, 0.34), transparent 70%);
   animation-duration: 38s;
 }
 
 .hero__nebula span:nth-child(2) {
   top: 40%;
   right: 4%;
-  width: 34vw;
-  height: 34vw;
-  max-width: 460px;
-  max-height: 460px;
-  background: radial-gradient(circle, rgba(194, 58, 83, 0.16), transparent 70%);
+  width: 38vw;
+  height: 38vw;
+  max-width: 500px;
+  max-height: 500px;
+  background: radial-gradient(circle, rgba(194, 58, 83, 0.26), transparent 70%);
   animation-duration: 46s;
   animation-delay: -10s;
 }
@@ -680,11 +680,11 @@ h1, h2, h3, h4 {
 .hero__nebula span:nth-child(3) {
   bottom: -6%;
   left: 30%;
-  width: 38vw;
-  height: 38vw;
-  max-width: 500px;
-  max-height: 500px;
-  background: radial-gradient(circle, rgba(147, 90, 230, 0.16), transparent 70%);
+  width: 42vw;
+  height: 42vw;
+  max-width: 540px;
+  max-height: 540px;
+  background: radial-gradient(circle, rgba(147, 90, 230, 0.26), transparent 70%);
   animation-duration: 52s;
   animation-delay: -20s;
 }
@@ -872,9 +872,10 @@ section {
 
 /* ---------- About ---------- */
 .about {
-  background: color-mix(in srgb, var(--bg-elevated) 58%, transparent);
-  backdrop-filter: blur(26px) saturate(180%);
-  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  position: relative;
+  background: color-mix(in srgb, var(--bg-elevated) 34%, transparent);
+  backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
+  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -945,9 +946,12 @@ section {
      toward this block's own --bg, the same liquid-glass material the
      navbar uses. color-mix() keeps this reusable across Tacta's black
      and Macinà's navy without a separate rgba() override per project. */
-  background: color-mix(in srgb, var(--bg) 58%, transparent);
-  backdrop-filter: blur(26px) saturate(180%);
-  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  background: color-mix(in srgb, var(--bg) 34%, transparent);
+  backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
+  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
+  /* A hairline top edge catching light, the same way the navbar's glass
+     panel reads as an actual pane and not just a tinted rectangle. */
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
   color: var(--text);
   min-height: clamp(420px, 52vw, 640px);
   display: flex;
@@ -1354,15 +1358,37 @@ section {
 
 /* ---------- Footer ---------- */
 footer {
+  position: relative;
   /* .theme-dark (added for its light text) also sets a solid
      background - overridden the same way as .product-block/.about, so
      the starfield stays visible all the way down to the footer instead
      of the page ending on a flat rectangle. */
-  background: color-mix(in srgb, var(--bg) 58%, transparent);
-  backdrop-filter: blur(26px) saturate(180%);
-  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  background: color-mix(in srgb, var(--bg) 34%, transparent);
+  backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
+  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.15);
   border-top: 1px solid var(--line);
   padding-block: 32px;
+}
+
+/* A soft diagonal sheen glancing across the top of every glass panel -
+   the same "light catching the surface" cue liquid glass gets its name
+   from, so each band reads as an actual pane of material sitting above
+   the starfield instead of just a tinted, blurred rectangle. Layered
+   over the color-mix() background, not part of it, so it stays a flat
+   highlight regardless of each project's own tint. */
+.product-block::before,
+.about::before,
+footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 18%,
+    transparent 42%
+  );
+  pointer-events: none;
 }
 
 .footer__status {
