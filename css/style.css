@@ -951,22 +951,6 @@ section {
   text-underline-offset: 3px;
 }
 
-/* Single centered group instead of .statement__meta's own two-column
-   role/tools grid - this section only has one (tools), not both. */
-.about__tools-meta {
-  margin-top: 40px;
-  grid-template-columns: 1fr;
-  max-width: none;
-}
-
-.about__tools-meta dt {
-  text-align: center;
-}
-
-.about__tools-meta .badge-row {
-  justify-content: center;
-}
-
 /* ---------- Work / Projects ---------- */
 /* Product blocks: one full-bleed, centered section per project - apple.com's
    own product-page pattern (headline, tagline, a single CTA, then an image),
