@@ -26,13 +26,13 @@
   if (heroEl && spaceCanvas) {
     const ctx = spaceCanvas.getContext("2d");
     const hasHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const STAR_DENSITY = 0.00009;
-    const MIN_STARS = 40;
+    const STAR_DENSITY = 0.00013;
+    const MIN_STARS = 55;
     const PULL_REACH = 220;
     const CAPTURE_RADIUS = 16;
     const DRIFT_SPEED = 0.15;
-    const ACCENT = [37, 84, 209];
-    const BASE = [20, 19, 15];
+    const ACCENT = [125, 160, 255];
+    const BASE = [237, 238, 242];
 
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
     let width = 0;
@@ -50,13 +50,19 @@
     function makeParticle() {
       const angle = Math.random() * Math.PI * 2;
       const speed = DRIFT_SPEED * (0.4 + Math.random() * 0.8);
+      /* ~1 in 6 stars is a "bright" one - bigger, more opaque, and the
+         only ones that glow at rest (see renderFrame) - a galaxy has a
+         handful of prominent stars among a lot of faint ones, not a
+         uniform field of identical dots. */
+      const bright = Math.random() < 0.16;
       return {
         x: Math.random() * width,
         y: Math.random() * height,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        r: 0.8 + Math.random() * 1.3,
-        baseAlpha: 0.16 + Math.random() * 0.34,
+        r: bright ? 1.5 + Math.random() * 1.3 : 0.6 + Math.random() * 1,
+        baseAlpha: bright ? 0.55 + Math.random() * 0.35 : 0.14 + Math.random() * 0.28,
+        bright,
       };
     }
 
@@ -112,9 +118,27 @@
 
         const speed = Math.min(1, Math.hypot(p.vx, p.vy) / 2.2);
         const alpha = Math.min(1, p.baseAlpha + speed * 0.55);
-        const color = speed > 0.22 ? ACCENT : BASE;
+        const isPulled = speed > 0.22;
+        const color = isPulled ? ACCENT : BASE;
+        const coreR = p.r + speed * 1.3;
+
+        /* Bright stars glow even at rest; any star caught in the pull
+           glows too (heating up as it falls in) - a radial-gradient
+           halo instead of ctx.filter blur, which is far cheaper to
+           redraw every frame across a whole field of particles. */
+        if (p.bright || isPulled) {
+          const glowR = coreR * (p.bright && isPulled ? 6 : 4.5);
+          const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
+          glow.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha * 0.45})`);
+          glow.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0)`);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
+          ctx.fillStyle = glow;
+          ctx.fill();
+        }
+
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r + speed * 1.3, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, coreR, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
         ctx.fill();
       }

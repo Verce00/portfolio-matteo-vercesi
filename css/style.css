@@ -563,7 +563,7 @@ h1, h2, h3, h4 {
 
 .hero__inner {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   width: 100%;
   max-width: 720px;
   margin-inline: auto;
@@ -630,6 +630,71 @@ h1, h2, h3, h4 {
    event horizon itself: a dark core with a thin accretion-disk ring,
    sitting exactly where the pull in the canvas originates - the same
    x/y drives both, so the visual and the physics agree. */
+.hero__nebula {
+  position: absolute;
+  inset: -10%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero__nebula span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  animation: hero-nebula-drift 40s ease-in-out infinite alternate;
+}
+
+.hero__nebula span:nth-child(1) {
+  top: 5%;
+  left: 8%;
+  width: 42vw;
+  height: 42vw;
+  max-width: 560px;
+  max-height: 560px;
+  background: radial-gradient(circle, rgba(77, 125, 255, 0.22), transparent 70%);
+  animation-duration: 38s;
+}
+
+.hero__nebula span:nth-child(2) {
+  top: 40%;
+  right: 4%;
+  width: 34vw;
+  height: 34vw;
+  max-width: 460px;
+  max-height: 460px;
+  background: radial-gradient(circle, rgba(194, 58, 83, 0.16), transparent 70%);
+  animation-duration: 46s;
+  animation-delay: -10s;
+}
+
+.hero__nebula span:nth-child(3) {
+  bottom: -6%;
+  left: 30%;
+  width: 38vw;
+  height: 38vw;
+  max-width: 500px;
+  max-height: 500px;
+  background: radial-gradient(circle, rgba(147, 90, 230, 0.16), transparent 70%);
+  animation-duration: 52s;
+  animation-delay: -20s;
+}
+
+@keyframes hero-nebula-drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(3%, 4%) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__nebula span {
+    animation: none;
+  }
+}
+
 .hero__space {
   position: absolute;
   inset: 0;
