@@ -105,7 +105,13 @@
       { passive: true }
     );
 
-    if (!prefersReducedMotion) {
+    /* Touch has no real cursor - a finger dragged across the hero (e.g.
+       mid-scroll) still fires pointermove, and without this check the
+       grid would glow and the ring would trail the finger like a stuck
+       ghost cursor. Real hover + a fine pointer (mouse/trackpad) only. */
+    const hasHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    if (hasHover && !prefersReducedMotion) {
       /* Trailing cursor ring: eased toward the real pointer every frame
          (a plain "snap to position" read as jittery/broken at 60fps for
          something meant to feel alive) - the loop only runs while the
@@ -149,7 +155,7 @@
           cursorRAF = null;
         }
       });
-    } else {
+    } else if (hasHover) {
       heroEl.addEventListener("pointermove", (e) => {
         const rect = heroEl.getBoundingClientRect();
         pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
