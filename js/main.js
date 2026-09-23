@@ -26,10 +26,10 @@
 
   if (heroEl && gridCanvas) {
     const ctx = gridCanvas.getContext("2d");
-    const SPACING = 36;
-    const RADIUS_BASE = 1.3;
-    const RADIUS_MAX = 3.6;
-    const REACH = 160;
+    const SPACING = 34;
+    const RADIUS_BASE = 1.1;
+    const RADIUS_MAX = 3.8;
+    const REACH = 210;
     const ACCENT = [37, 84, 209];
     const BASE = [20, 19, 15];
 
@@ -51,30 +51,83 @@
       drawGrid();
     }
 
+    /* Three layers, not one: faint structural lines (the "blueprint" a
+       layout grid actually is), a proximity mesh that only appears
+       between neighboring dots the pointer is close to (a constellation
+       forming and dissolving as you move, not just isolated dots
+       glowing in place), and the dots themselves on top as the mesh's
+       own nodes. */
     function drawGrid() {
       ctx.clearRect(0, 0, width, height);
       const cols = Math.ceil(width / SPACING) + 1;
       const rows = Math.ceil(height / SPACING) + 1;
+
+      ctx.strokeStyle = "rgba(20, 19, 15, 0.05)";
+      ctx.lineWidth = 1;
       for (let i = 0; i < cols; i++) {
+        const x = i * SPACING;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let j = 0; j < rows; j++) {
+        const y = j * SPACING;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      const t = [];
+      for (let i = 0; i < cols; i++) {
+        t[i] = [];
         for (let j = 0; j < rows; j++) {
-          const x = i * SPACING;
-          const y = j * SPACING;
-          let radius = RADIUS_BASE;
-          let alpha = 0.14;
-          let color = BASE;
+          let val = 0;
           if (pointer) {
-            const dx = x - pointer.x;
-            const dy = y - pointer.y;
+            const dx = i * SPACING - pointer.x;
+            const dy = j * SPACING - pointer.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < REACH) {
-              const t = 1 - dist / REACH;
-              radius = RADIUS_BASE + (RADIUS_MAX - RADIUS_BASE) * t;
-              alpha = 0.14 + 0.7 * t;
-              color = ACCENT;
+            if (dist < REACH) val = 1 - dist / REACH;
+          }
+          t[i][j] = val;
+        }
+      }
+
+      if (pointer) {
+        ctx.lineWidth = 1;
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            const tv = t[i][j];
+            if (tv <= 0) continue;
+            const x = i * SPACING;
+            const y = j * SPACING;
+            if (i + 1 < cols && t[i + 1][j] > 0) {
+              ctx.strokeStyle = `rgba(37, 84, 209, ${Math.min(tv, t[i + 1][j]) * 0.55})`;
+              ctx.beginPath();
+              ctx.moveTo(x, y);
+              ctx.lineTo(x + SPACING, y);
+              ctx.stroke();
+            }
+            if (j + 1 < rows && t[i][j + 1] > 0) {
+              ctx.strokeStyle = `rgba(37, 84, 209, ${Math.min(tv, t[i][j + 1]) * 0.55})`;
+              ctx.beginPath();
+              ctx.moveTo(x, y);
+              ctx.lineTo(x, y + SPACING);
+              ctx.stroke();
             }
           }
+        }
+      }
+
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          const tv = t[i][j];
+          const radius = RADIUS_BASE + (RADIUS_MAX - RADIUS_BASE) * tv;
+          const alpha = 0.14 + 0.7 * tv;
+          const color = tv > 0 ? ACCENT : BASE;
           ctx.beginPath();
-          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.arc(i * SPACING, j * SPACING, radius, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
           ctx.fill();
         }
