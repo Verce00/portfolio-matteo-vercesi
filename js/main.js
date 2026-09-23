@@ -11,19 +11,20 @@
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* Hero background: the logo is a stylized black hole, so the hero
-     becomes one - a field of stars drifting on their own, pulled into
-     orbit and swallowed when they stray too close to the pointer (the
-     event horizon), then reborn elsewhere. The pointer position drives
-     both the physics here and the .hero__cursor element in CSS, which
-     renders the horizon itself. The animation loop is gated by an
-     IntersectionObserver, so it only runs while the hero is actually
-     on screen - scrolled past, it stops costing anything. */
-  const heroEl = document.querySelector(".hero");
+  /* Page background (home page only): the logo is a stylized black
+     hole, so the whole page sits over one - a field of stars drifting
+     on their own, pulled into orbit and swallowed when they stray too
+     close to the pointer (the event horizon), then reborn elsewhere.
+     Fixed to the viewport, not scoped to the hero, so it stays behind
+     every section as the page scrolls. The pointer position (anywhere
+     in the document, not just the hero) drives both the physics here
+     and the .hero__cursor element in CSS. The animation loop pauses
+     only when the tab itself is hidden - it's meant to be visible
+     everywhere on this page, not just near the top. */
   const spaceCanvas = document.getElementById("heroSpace");
   const cursorEl = document.getElementById("heroCursor");
 
-  if (heroEl && spaceCanvas) {
+  if (spaceCanvas) {
     const ctx = spaceCanvas.getContext("2d");
     const hasHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const STAR_DENSITY = 0.00013;
@@ -67,9 +68,8 @@
     }
 
     function resize() {
-      const rect = heroEl.getBoundingClientRect();
-      width = rect.width;
-      height = rect.height;
+      width = window.innerWidth;
+      height = window.innerHeight;
       spaceCanvas.width = Math.round(width * dpr);
       spaceCanvas.height = Math.round(height * dpr);
       spaceCanvas.style.width = `${width}px`;
@@ -186,33 +186,30 @@
     );
 
     if (!prefersReducedMotion) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) start();
-          else stop();
-        },
-        { threshold: 0 }
-      );
-      io.observe(heroEl);
+      start();
+      /* Only real reason to stop redrawing something that's always on
+         screen: the tab itself isn't visible. */
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stop();
+        else start();
+      });
     }
 
-    /* Touch has no real cursor - a finger dragged across the hero (e.g.
-       mid-scroll) still fires pointermove, and without this check every
-       swipe would yank stars around like a stuck ghost cursor. Real
-       hover + a fine pointer (mouse/trackpad) only. */
+    /* Touch has no real cursor - a finger dragged anywhere on the page
+       (e.g. mid-scroll) still fires pointermove, and without this check
+       every swipe would yank stars around like a stuck ghost cursor.
+       Real hover + a fine pointer (mouse/trackpad) only. Listens on the
+       document, not the hero, so the pull follows you the whole way
+       down the page. */
     if (hasHover && !prefersReducedMotion) {
-      heroEl.addEventListener("pointermove", (e) => {
-        const rect = heroEl.getBoundingClientRect();
-        pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      document.addEventListener("pointermove", (e) => {
+        pointer = { x: e.clientX, y: e.clientY };
         targetX = pointer.x;
         targetY = pointer.y;
-      });
-
-      heroEl.addEventListener("pointerenter", () => {
         if (cursorEl) cursorEl.classList.add("is-active");
       });
 
-      heroEl.addEventListener("pointerleave", () => {
+      document.addEventListener("pointerleave", () => {
         pointer = null;
         if (cursorEl) cursorEl.classList.remove("is-active");
       });

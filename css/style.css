@@ -125,7 +125,7 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   font-family: var(--font-body);
   font-size: 16px;
@@ -371,14 +371,15 @@ h1, h2, h3, h4 {
 }
 
 /* Home page only: a persistent glass panel instead of the transparent bar
-   that just reads through to whatever's scrolled underneath - light tint,
-   strong blur, thin bright border, the same liquid-glass material used
-   throughout the nav. */
+   that just reads through to whatever's scrolled underneath - dark tint
+   (the whole home page sits on the same starfield now, not just the
+   hero), strong blur, thin bright rim, the same liquid-glass material
+   used throughout the nav. */
 .nav--glass {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(8, 9, 12, 0.45);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   /* Stretches the glass panel itself up behind the notch/Dynamic-Island
      cutout instead of leaving that strip as flat html/body background -
      one continuous blurred surface instead of a hard seam between "glass"
@@ -403,7 +404,7 @@ h1, h2, h3, h4 {
   left: 0;
   right: 0;
   height: env(safe-area-inset-top, 0px);
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+  background: linear-gradient(to bottom, rgba(8, 9, 12, 0.85), rgba(8, 9, 12, 0));
   pointer-events: none;
 }
 
@@ -559,6 +560,10 @@ h1, h2, h3, h4 {
   padding-top: calc(56px + env(safe-area-inset-top, 0px));
   padding-bottom: clamp(16px, 4dvh, 72px);
   overflow: hidden;
+  /* .theme-dark (for the light text) also sets a solid background -
+     overridden back to transparent here so the fixed starfield behind
+     the whole page shows through instead of being painted over. */
+  background: transparent;
 }
 
 .hero__inner {
@@ -623,17 +628,21 @@ h1, h2, h3, h4 {
   }
 }
 
-/* The hero's own background: the logo is a stylized black hole, so the
-   hero itself becomes one - a field of stars drifting on their own,
-   pulled into orbit and swallowed when they stray too close to the
-   pointer (see the particle sim in main.js). .hero__cursor renders the
-   event horizon itself: a dark core with a thin accretion-disk ring,
-   sitting exactly where the pull in the canvas originates - the same
-   x/y drives both, so the visual and the physics agree. */
+/* The page's own background, not just the hero's: the logo is a
+   stylized black hole, so the whole home page sits over one - a field
+   of stars drifting on their own, pulled into orbit and swallowed when
+   they stray too close to the pointer (see the particle sim in
+   main.js). Fixed to the viewport (not the hero) so it stays put
+   behind every section as the page scrolls; every section's own
+   background is translucent glass (see .product-block/.about/footer
+   below) so the stars show through, blurred, underneath. .hero__cursor
+   renders the event horizon itself - a dark core with a thin
+   accretion-disk ring, sitting exactly where the pull in the canvas
+   originates. */
 .hero__nebula {
-  position: absolute;
+  position: fixed;
   inset: -10%;
-  z-index: 0;
+  z-index: -1;
   overflow: hidden;
   pointer-events: none;
 }
@@ -696,21 +705,21 @@ h1, h2, h3, h4 {
 }
 
 .hero__space {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
 }
 
 .hero__cursor {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 20px;
   height: 20px;
   margin: -10px 0 0 -10px;
   border-radius: 50%;
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
   opacity: 0;
   transition: opacity 250ms var(--ease);
@@ -863,7 +872,9 @@ section {
 
 /* ---------- About ---------- */
 .about {
-  background: var(--bg-elevated);
+  background: color-mix(in srgb, var(--bg-elevated) 58%, transparent);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -929,7 +940,14 @@ section {
      inside it with visible background on both sides. */
   position: relative;
   overflow-x: hidden;
-  background: var(--bg);
+  /* Translucent glass instead of a flat fill - the page's fixed
+     starfield (see .hero__space) shows through, blurred and tinted
+     toward this block's own --bg, the same liquid-glass material the
+     navbar uses. color-mix() keeps this reusable across Tacta's black
+     and Macinà's navy without a separate rgba() override per project. */
+  background: color-mix(in srgb, var(--bg) 58%, transparent);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
   color: var(--text);
   min-height: clamp(420px, 52vw, 640px);
   display: flex;
@@ -1336,6 +1354,13 @@ section {
 
 /* ---------- Footer ---------- */
 footer {
+  /* .theme-dark (added for its light text) also sets a solid
+     background - overridden the same way as .product-block/.about, so
+     the starfield stays visible all the way down to the footer instead
+     of the page ending on a flat rectangle. */
+  background: color-mix(in srgb, var(--bg) 58%, transparent);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
   border-top: 1px solid var(--line);
   padding-block: 32px;
 }
