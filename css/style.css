@@ -122,6 +122,23 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  /* The browser's own view-transition pseudo-elements sit outside the
+     normal DOM, so the universal * selector above doesn't reliably reach
+     them - named explicitly here as a safety net. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Cross-document view transitions between index.html and the project
+   pages (see <meta name="view-transition"> in each <head>) - a plain
+   crossfade, ignored entirely by browsers that don't support it yet, so
+   navigation there just stays instant as it always was. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: var(--ease);
 }
 
 body {
@@ -430,6 +447,11 @@ h1, h2, h3, h4 {
   height: 15px;
   width: auto;
   flex-shrink: 0;
+  transition: transform 600ms var(--ease);
+}
+
+.nav__logo:hover .nav__logo-mark {
+  transform: rotate(20deg);
 }
 
 .nav__center {
@@ -455,9 +477,27 @@ h1, h2, h3, h4 {
   transition: opacity var(--dur-fast) var(--ease);
 }
 
+.nav__pill::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
 .nav__pill:hover,
 .nav__pill:focus-visible {
   opacity: 1;
+}
+
+.nav__pill:hover::after,
+.nav__pill:focus-visible::after {
+  transform: scaleX(1);
 }
 
 .nav__cta {
@@ -594,6 +634,9 @@ h1, h2, h3, h4 {
   width: min(100%, 380px, 40dvh);
   aspect-ratio: 4 / 5;
   margin-inline: auto;
+  opacity: 0;
+  animation: fade-up var(--dur-slow) var(--ease) forwards;
+  animation-delay: 0.32s;
 }
 
 @media (min-width: 860px) {
@@ -710,8 +753,7 @@ h1, h2, h3, h4 {
   max-height: 620px;
   border-radius: 50%;
   filter: blur(90px);
-  /* Drift paused with the rest of the site's animations - see .reveal. */
-  /* animation: aurora-drift 26s ease-in-out infinite alternate; */
+  animation: aurora-drift 26s ease-in-out infinite alternate;
 }
 
 .aurora__blob--a {
@@ -761,6 +803,8 @@ h1, h2, h3, h4 {
 
 .hero .eyebrow {
   margin-bottom: clamp(8px, 2dvh, 18px);
+  opacity: 0;
+  animation: fade-up var(--dur-slow) var(--ease) forwards;
 }
 
 /* Bold sans-serif display type for the headline - apple.com's own hero
@@ -778,9 +822,9 @@ h1, h2, h3, h4 {
   line-height: 1.08;
   max-width: 16ch;
   margin-inline: auto;
-  /* Entrance animation paused with the rest of the site - see .reveal. */
-  /* opacity: 0;
-  animation: fade-up var(--dur-slow) var(--ease) forwards; */
+  opacity: 0;
+  animation: fade-up var(--dur-slow) var(--ease) forwards;
+  animation-delay: 0.08s;
 }
 
 .hero__tagline {
@@ -789,9 +833,9 @@ h1, h2, h3, h4 {
   margin-inline: auto;
   font-size: clamp(0.95rem, min(2.2vw, 2.3dvh), 1.4rem);
   color: var(--text-muted);
-  /* opacity: 0;
+  opacity: 0;
   animation: fade-up var(--dur-slow) var(--ease) forwards;
-  animation-delay: 0.06s; */
+  animation-delay: 0.16s;
 }
 
 .hero__caption {
@@ -801,9 +845,6 @@ h1, h2, h3, h4 {
   margin-top: 14px;
   font-size: 0.92rem;
   color: var(--text-dim);
-  /* opacity: 0;
-  animation: fade-up var(--dur-slow) var(--ease) forwards;
-  animation-delay: 0.1s; */
 }
 
 @keyframes fade-up {
@@ -828,9 +869,9 @@ h1, h2, h3, h4 {
   align-items: center;
   gap: 16px;
   margin-top: clamp(14px, 3dvh, 28px);
-  /* opacity: 0;
+  opacity: 0;
   animation: fade-up var(--dur-slow) var(--ease) forwards;
-  animation-delay: 0.14s; */
+  animation-delay: 0.24s;
 }
 
 /* ---------- Section shell ---------- */
@@ -863,21 +904,15 @@ section {
   font-size: 1.02rem;
 }
 
-/* Animations paused site-wide for now (nav excluded) - re-enable by
-   restoring the commented-out declarations below once the rest of the
-   site's content work is settled. Markup/JS untouched on purpose: every
-   .reveal class and the IntersectionObserver driving it are still in
-   place, so turning this back on later is just uncommenting these two
-   rules, not re-adding classes across every page again. */
 .reveal {
-  /* opacity: 0;
+  opacity: 0;
   transform: translateY(28px) scale(0.98);
-  transition: opacity 0.8s var(--ease), transform 0.8s var(--spring); */
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--spring);
 }
 
 .reveal.is-visible {
-  /* opacity: 1;
-  transform: translateY(0) scale(1); */
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 /* ---------- About ---------- */
